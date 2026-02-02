@@ -1,0 +1,30 @@
+name: Transloaded
+options:
+  bundleIdPrefix: com.transloaded
+  deploymentTarget:
+    macOS: "15.0"
+  xcodeVersion: "26.2"
+  minimumXcodeGenVersion: "2.0"
+
+targets:
+  Transloaded:
+    type: application
+    platform: macOS
+    sources:
+      - Transloaded
+    entitlements:
+      path: Transloaded/Transloaded.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.transloaded.app
+        PRODUCT_NAME: Transloaded
+        SWIFT_VERSION: "6.0"
+        MACOSX_DEPLOYMENT_TARGET: "15.0"
+        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.productivity"
+        GENERATE_INFOPLIST_FILE: YES
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: "1.0"
+        CODE_SIGN_ENTITLEMENTS: Transloaded/Transloaded.entitlements
+        CODE_SIGN_IDENTITY: "-"
+        INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright 2025 Transloaded. All rights reserved."
+        INFOPLIST_KEY_CFBundleDisplayName: Transloaded
