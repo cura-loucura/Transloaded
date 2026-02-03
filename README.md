@@ -1,4 +1,5 @@
 # Transloaded
+![Icon](./assets/AppIcon.png| width=80)
 
 A native macOS file translation app powered by Apple's on-device Translation framework. Open files and directories, auto-detect languages, and translate content side-by-side — all offline, all private.
 
