@@ -9,7 +9,7 @@ class SettingsState {
     private static let lastSourceLanguageKey = "lastSourceLanguage"
     private static let lastTargetLanguageKey = "lastTargetLanguage"
 
-    let allLanguages: [SupportedLanguage] = SupportedLanguage.allCases
+    let allLanguages: [SupportedLanguage] = SupportedLanguage.defaultActive
 
     var activeLanguages: [SupportedLanguage] {
         didSet { saveActiveLanguages() }
@@ -43,9 +43,9 @@ class SettingsState {
         // Load active languages
         if let rawValues = UserDefaults.standard.stringArray(forKey: Self.activeLanguagesKey) {
             let loaded = rawValues.compactMap { SupportedLanguage(rawValue: $0) }
-            self.activeLanguages = loaded.isEmpty ? SupportedLanguage.allCases : loaded
+            self.activeLanguages = loaded.isEmpty ? SupportedLanguage.defaultActive : loaded
         } else {
-            self.activeLanguages = SupportedLanguage.allCases
+            self.activeLanguages = SupportedLanguage.defaultActive
         }
 
         // Load default source language

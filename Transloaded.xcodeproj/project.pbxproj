@@ -24,6 +24,7 @@
 		8ECA300D87A27DED3D793951 /* TranslationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9A3AF9CAD9B858ACC78612 /* TranslationViewModel.swift */; };
 		932F6026C5313B1793255EF4 /* TransloadedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2627E87F7E3AF1223E2A2D1A /* TransloadedApp.swift */; };
 		BA50A0E27ED6FF25E6E5D465 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1C14B169DB4103AA755EC0A8 /* Preview Assets.xcassets */; };
+		C599F976FF5FE88C130F64E5 /* RecentItemsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4F04861E45A9074EC67F19 /* RecentItemsManager.swift */; };
 		C60CB08644BC45898044C6A6 /* TranslationPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D3E3261C0C15990BAE45D4 /* TranslationPanelView.swift */; };
 		C7325A12F4914C7241A12972 /* TranslationPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6583AC63503A78DB6584C0E7 /* TranslationPanel.swift */; };
 		D863EF12DCE656AFF566345C /* SettingsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD90D58D1B9E48AE53327498 /* SettingsState.swift */; };
@@ -55,6 +56,7 @@
 		CD90D58D1B9E48AE53327498 /* SettingsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsState.swift; sourceTree = "<group>"; };
 		E2CA68A4D53F2D1B6F2D468B /* TranslationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationService.swift; sourceTree = "<group>"; };
 		E608BBA51627EBE0B491C3D9 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		EB4F04861E45A9074EC67F19 /* RecentItemsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentItemsManager.swift; sourceTree = "<group>"; };
 		EBACA0B52C0686ED87F97F04 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -144,6 +146,7 @@
 			children = (
 				9BF7ABB473FE6CB69E328EA6 /* FileSystemService.swift */,
 				0B41CB69547601DDF7FE99E8 /* FileWatcherService.swift */,
+				EB4F04861E45A9074EC67F19 /* RecentItemsManager.swift */,
 				E2CA68A4D53F2D1B6F2D468B /* TranslationService.swift */,
 			);
 			path = Services;
@@ -252,6 +255,7 @@
 				293945FF01F705A105FB5286 /* FileTabBar.swift in Sources */,
 				2F6371C2CAD84E2B0B2206C5 /* FileWatcherService.swift in Sources */,
 				68C3AB485ACAA8D3978B4BA2 /* OpenFile.swift in Sources */,
+				C599F976FF5FE88C130F64E5 /* RecentItemsManager.swift in Sources */,
 				D863EF12DCE656AFF566345C /* SettingsState.swift in Sources */,
 				7ED198C5C8FA17CD8D584B39 /* SettingsView.swift in Sources */,
 				73D283B8E8187FCBD479C873 /* SidebarView.swift in Sources */,

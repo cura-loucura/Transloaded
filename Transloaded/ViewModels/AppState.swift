@@ -14,6 +14,7 @@ class AppState {
     private let fileWatcherService = FileWatcherService()
     var translationService: TranslationService?
     var settingsState: SettingsState?
+    var recentItemsManager: RecentItemsManager?
 
     // Error alert state
     var showError: Bool = false
@@ -78,6 +79,7 @@ class AppState {
             )
             openFiles.append(file)
             activeFileID = file.id
+            recentItemsManager?.addRecentFile(url)
             fileWatcherService.watch(url: url) { [weak self] changedURL in
                 Task { @MainActor in
                     self?.markFileAsExternallyModified(url: changedURL)
@@ -216,23 +218,81 @@ class AppState {
         }
     }
 
-    // MARK: - Save Translation
+    // MARK: - Scrapbook
 
-    func saveActiveTranslation() {
-        guard let panelID = activeTranslationPanelID,
-              let panel = translationPanels.first(where: { $0.id == panelID }),
-              let file = openFiles.first(where: { $0.id == panel.fileID }) else { return }
+    // Close scrapbook alert state
+    var showCloseScrapbookAlert: Bool = false
+    private var pendingCloseScrapbookID: UUID?
+    private var scrapbookDetectionTask: Task<Void, Never>?
 
-        let url = defaultSaveURL(for: file.url, language: panel.targetLanguage)
-        do {
-            try panel.translatedContent.write(to: url, atomically: true, encoding: .utf8)
-        } catch {
-            errorMessage = "Failed to save translation: \(error.localizedDescription)"
-            showError = true
+    func openScrapbook() {
+        // If scrapbook is already open, just switch to it
+        if let existing = openFiles.first(where: { $0.isScrapbook }) {
+            activeFileID = existing.id
+            return
+        }
+
+        let scrapbook = OpenFile.newScrapbook()
+        openFiles.insert(scrapbook, at: 0)
+        activeFileID = scrapbook.id
+    }
+
+    func closeScrapbook(id: UUID) {
+        guard let file = openFiles.first(where: { $0.id == id }),
+              file.isScrapbook else { return }
+
+        if !file.content.isEmpty {
+            pendingCloseScrapbookID = id
+            showCloseScrapbookAlert = true
+        } else {
+            closeFile(id: id)
         }
     }
 
-    func saveActiveTranslationAs() {
+    func confirmCloseScrapbook() {
+        guard let id = pendingCloseScrapbookID else { return }
+        pendingCloseScrapbookID = nil
+        showCloseScrapbookAlert = false
+        closeFile(id: id)
+    }
+
+    func cancelCloseScrapbook() {
+        pendingCloseScrapbookID = nil
+        showCloseScrapbookAlert = false
+    }
+
+    func updateScrapbookContent(_ content: String) {
+        guard let index = openFiles.firstIndex(where: { $0.isScrapbook }) else { return }
+        openFiles[index].content = content
+
+        // Debounce: after 800ms of no further edits, detect language & retranslate
+        scrapbookDetectionTask?.cancel()
+        scrapbookDetectionTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .milliseconds(800))
+            guard !Task.isCancelled else { return }
+            self?.detectAndRetranslateScrapbook()
+        }
+    }
+
+    func onScrapbookFocusLost() {
+        scrapbookDetectionTask?.cancel()
+        detectAndRetranslateScrapbook()
+    }
+
+    private func detectAndRetranslateScrapbook() {
+        guard let index = openFiles.firstIndex(where: { $0.isScrapbook }),
+              !openFiles[index].content.isEmpty else { return }
+        let detected = detectLanguage(for: openFiles[index].content)
+        openFiles[index].detectedLanguage = detected
+        if openFiles[index].selectedSourceLanguage == nil {
+            openFiles[index].selectedSourceLanguage = detected
+        }
+        retranslateAllPanels(for: openFiles[index].id)
+    }
+
+    // MARK: - Save Translation
+
+    func saveActiveTranslation() {
         guard let panelID = activeTranslationPanelID,
               let panel = translationPanels.first(where: { $0.id == panelID }),
               let file = openFiles.first(where: { $0.id == panel.fileID }) else { return }
@@ -280,10 +340,26 @@ class AppState {
         guard let dominant = recognizer.dominantLanguage else { return nil }
 
         switch dominant {
+        case .arabic: return .arabic
+        case .simplifiedChinese: return .chineseSimplified
+        case .traditionalChinese: return .chineseTraditional
+        case .dutch: return .dutch
         case .english: return .english
         case .french: return .french
+        case .german: return .german
+        case .hindi: return .hindi
+        case .indonesian: return .indonesian
+        case .italian: return .italian
         case .japanese: return .japanese
+        case .korean: return .korean
+        case .polish: return .polish
         case .portuguese: return .portuguese
+        case .russian: return .russian
+        case .spanish: return .spanish
+        case .thai: return .thai
+        case .turkish: return .turkish
+        case .ukrainian: return .ukrainian
+        case .vietnamese: return .vietnamese
         default: return nil
         }
     }

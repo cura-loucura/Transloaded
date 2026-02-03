@@ -6,6 +6,7 @@ struct TransloadedApp: App {
     @State private var appState = AppState()
     @State private var translationViewModel = TranslationViewModel()
     @State private var settingsState = SettingsState()
+    @State private var recentItemsManager = RecentItemsManager()
 
     var body: some Scene {
         WindowGroup {
@@ -18,6 +19,8 @@ struct TransloadedApp: App {
             .onAppear {
                 appState.translationService = translationViewModel.translationService
                 appState.settingsState = settingsState
+                appState.recentItemsManager = recentItemsManager
+                sidebarViewModel.recentItemsManager = recentItemsManager
             }
         }
         .defaultSize(width: 1200, height: 800)
@@ -33,19 +36,45 @@ struct TransloadedApp: App {
                     sidebarViewModel.addDirectory()
                 }
                 .keyboardShortcut("o", modifiers: [.command, .shift])
+
+                Menu("Open Recent") {
+                    if recentItemsManager.recentFiles.isEmpty && recentItemsManager.recentFolders.isEmpty {
+                        Text("No Recent Items")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Section("Files") {
+                            ForEach(recentItemsManager.recentFiles) { item in
+                                Button(item.name) {
+                                    openRecentFile(item)
+                                }
+                            }
+                        }
+
+                        if !recentItemsManager.recentFolders.isEmpty {
+                            Divider()
+                            Section("Folders") {
+                                ForEach(recentItemsManager.recentFolders) { item in
+                                    Button(item.name) {
+                                        openRecentFolder(item)
+                                    }
+                                }
+                            }
+                        }
+
+                        Divider()
+
+                        Button("Clear List") {
+                            recentItemsManager.clearAll()
+                        }
+                    }
+                }
             }
 
             CommandGroup(after: .saveItem) {
-                Button("Save Translation") {
+                Button("Save Translation...") {
                     appState.saveActiveTranslation()
                 }
                 .keyboardShortcut("s", modifiers: .command)
-                .disabled(appState.activeTranslationPanelID == nil)
-
-                Button("Save Translation To...") {
-                    appState.saveActiveTranslationAs()
-                }
-                .keyboardShortcut("s", modifiers: [.command, .shift])
                 .disabled(appState.activeTranslationPanelID == nil)
 
                 Divider()
@@ -67,5 +96,16 @@ struct TransloadedApp: App {
         Settings {
             SettingsView(settingsState: settingsState)
         }
+    }
+
+    private func openRecentFile(_ item: RecentItemsManager.RecentItem) {
+        guard let url = recentItemsManager.resolveAndAccess(item) else { return }
+        sidebarViewModel.addURLs([url])
+        appState.openFile(url: url)
+    }
+
+    private func openRecentFolder(_ item: RecentItemsManager.RecentItem) {
+        guard let url = recentItemsManager.resolveAndAccess(item) else { return }
+        sidebarViewModel.addURLs([url])
     }
 }

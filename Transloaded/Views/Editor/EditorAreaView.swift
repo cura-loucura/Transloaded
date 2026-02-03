@@ -33,7 +33,14 @@ struct EditorAreaView: View {
                 files: appState.openFiles,
                 activeFileID: appState.activeFileID,
                 onSelect: { appState.setActiveFile(id: $0) },
-                onClose: { appState.closeFile(id: $0) }
+                onClose: { id in
+                    // Use scrapbook close for scrapbook files
+                    if let file = appState.openFiles.first(where: { $0.id == id }), file.isScrapbook {
+                        appState.closeScrapbook(id: id)
+                    } else {
+                        appState.closeFile(id: id)
+                    }
+                }
             )
 
             Spacer()
@@ -118,19 +125,11 @@ struct EditorAreaView: View {
     private var contentArea: some View {
         let panels = appState.visibleTranslationPanels
         if panels.isEmpty {
-            FileContentView(
-                file: appState.activeFile,
-                onReload: { id in appState.reloadFile(id: id) },
-                onDismissReload: { id in appState.dismissReloadBanner(id: id) }
-            )
+            fileContentView
         } else {
             HSplitView {
-                FileContentView(
-                    file: appState.activeFile,
-                    onReload: { id in appState.reloadFile(id: id) },
-                    onDismissReload: { id in appState.dismissReloadBanner(id: id) }
-                )
-                .frame(minWidth: 300)
+                fileContentView
+                    .frame(minWidth: 300)
 
                 ForEach(panels) { panel in
                     TranslationPanelView(
@@ -141,6 +140,16 @@ struct EditorAreaView: View {
                 }
             }
         }
+    }
+
+    private var fileContentView: some View {
+        FileContentView(
+            file: appState.activeFile,
+            onReload: { id in appState.reloadFile(id: id) },
+            onDismissReload: { id in appState.dismissReloadBanner(id: id) },
+            onScrapbookContentChange: { content in appState.updateScrapbookContent(content) },
+            onScrapbookFocusLost: { appState.onScrapbookFocusLost() }
+        )
     }
 
     // MARK: - Language Pack Status

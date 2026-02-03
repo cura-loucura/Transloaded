@@ -13,6 +13,7 @@ struct FileTabBar: View {
                     FileTab(
                         name: file.name,
                         isActive: file.id == activeFileID,
+                        isScrapbook: file.isScrapbook,
                         onSelect: { onSelect(file.id) },
                         onClose: { onClose(file.id) }
                     )
@@ -27,6 +28,7 @@ struct FileTabBar: View {
 private struct FileTab: View {
     let name: String
     let isActive: Bool
+    let isScrapbook: Bool
     let onSelect: () -> Void
     let onClose: () -> Void
 
@@ -34,6 +36,12 @@ private struct FileTab: View {
 
     var body: some View {
         HStack(spacing: 6) {
+            if isScrapbook {
+                Image(systemName: "square.and.pencil")
+                    .font(.system(size: 10))
+                    .foregroundStyle(.secondary)
+            }
+
             Text(name)
                 .font(.system(size: 12))
                 .lineLimit(1)

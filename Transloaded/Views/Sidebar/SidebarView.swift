@@ -2,16 +2,37 @@ import SwiftUI
 
 struct SidebarView: View {
     @Bindable var viewModel: SidebarViewModel
+    @Binding var selectedFileURL: URL?
+    var onOpenScrapbook: (() -> Void)?
 
     var body: some View {
-        Group {
-            if viewModel.roots.isEmpty {
-                emptyState
-            } else {
-                fileTree
+        VStack(spacing: 0) {
+            scrapbookButton
+            Divider()
+
+            Group {
+                if viewModel.roots.isEmpty {
+                    emptyState
+                } else {
+                    fileTree
+                }
             }
+            .frame(maxHeight: .infinity)
         }
         .frame(minWidth: 200)
+    }
+
+    private var scrapbookButton: some View {
+        Button {
+            onOpenScrapbook?()
+        } label: {
+            Label("Scrapbook", systemImage: "square.and.pencil")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 6)
+        }
+        .buttonStyle(.plain)
+        .background(Color.primary.opacity(0.04))
     }
 
     private var emptyState: some View {
@@ -32,7 +53,7 @@ struct SidebarView: View {
     }
 
     private var fileTree: some View {
-        List {
+        List(selection: $selectedFileURL) {
             ForEach(viewModel.roots) { root in
                 SidebarFileItemView(item: root, isRoot: true, viewModel: viewModel)
             }
@@ -45,6 +66,8 @@ struct SidebarFileItemView: View {
     let item: FileItem
     let isRoot: Bool
     let viewModel: SidebarViewModel
+
+    @State private var isHovered = false
 
     var body: some View {
         if item.isDirectory {
@@ -68,8 +91,18 @@ struct SidebarFileItemView: View {
         } else {
             Label(item.name, systemImage: fileIcon)
                 .foregroundStyle(item.isTextFile ? .primary : .tertiary)
+                .tag(item.url)
                 .onTapGesture(count: 2) {
                     viewModel.handleDoubleClick(on: item)
+                }
+                .padding(.vertical, 1)
+                .padding(.horizontal, 2)
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(isHovered ? Color.primary.opacity(0.06) : Color.clear)
+                )
+                .onHover { hovering in
+                    isHovered = hovering
                 }
                 .contextMenu {
                     if isRoot {

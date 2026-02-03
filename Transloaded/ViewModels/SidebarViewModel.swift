@@ -9,6 +9,7 @@ class SidebarViewModel {
     private let fileSystemService = FileSystemService()
 
     var onFileDoubleClick: ((URL) -> Void)?
+    var recentItemsManager: RecentItemsManager?
 
     func addDirectory() {
         let panel = NSOpenPanel()
@@ -23,6 +24,7 @@ class SidebarViewModel {
 
         let item = fileSystemService.loadDirectory(at: url)
         roots.append(item)
+        recentItemsManager?.addRecentFolder(url)
     }
 
     func addFile() {

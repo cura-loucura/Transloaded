@@ -4,25 +4,56 @@ struct FileContentView: View {
     let file: OpenFile?
     var onReload: ((UUID) -> Void)?
     var onDismissReload: ((UUID) -> Void)?
+    var onScrapbookContentChange: ((String) -> Void)?
+    var onScrapbookFocusLost: (() -> Void)?
+
+    @FocusState private var isScrapbookFocused: Bool
+    @State private var scrapbookText: String = ""
 
     var body: some View {
         if let file {
-            VStack(spacing: 0) {
-                if file.isExternallyModified {
-                    reloadBanner(for: file)
-                }
-
-                ScrollView([.horizontal, .vertical]) {
-                    Text(file.content)
-                        .font(.system(.body, design: .monospaced))
-                        .textSelection(.enabled)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            if file.isScrapbook {
+                scrapbookEditor(for: file)
+            } else {
+                fileContent(for: file)
             }
         } else {
             emptyState
+        }
+    }
+
+    private func scrapbookEditor(for file: OpenFile) -> some View {
+        TextEditor(text: $scrapbookText)
+            .font(.system(.body, design: .monospaced))
+            .focused($isScrapbookFocused)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .onAppear {
+                scrapbookText = file.content
+            }
+            .onChange(of: scrapbookText) { _, newValue in
+                onScrapbookContentChange?(newValue)
+            }
+            .onChange(of: isScrapbookFocused) { _, focused in
+                if !focused {
+                    onScrapbookFocusLost?()
+                }
+            }
+    }
+
+    private func fileContent(for file: OpenFile) -> some View {
+        VStack(spacing: 0) {
+            if file.isExternallyModified {
+                reloadBanner(for: file)
+            }
+
+            ScrollView([.horizontal, .vertical]) {
+                Text(file.content)
+                    .font(.system(.body, design: .monospaced))
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 

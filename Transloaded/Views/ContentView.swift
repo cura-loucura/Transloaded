@@ -8,10 +8,27 @@ struct ContentView: View {
     @Bindable var translationViewModel: TranslationViewModel
     @Bindable var settingsState: SettingsState
 
+    private var selectedFileURL: Binding<URL?> {
+        Binding<URL?>(
+            get: { appState.activeFile?.url },
+            set: { newURL in
+                guard let url = newURL else { return }
+                // Only switch to already-open files; don't open new ones
+                if let existing = appState.openFiles.first(where: { $0.url == url }) {
+                    appState.setActiveFile(id: existing.id)
+                }
+            }
+        )
+    }
+
     var body: some View {
         NavigationSplitView {
-            SidebarView(viewModel: sidebarViewModel)
-                .navigationSplitViewColumnWidth(min: 200, ideal: 250, max: 400)
+            SidebarView(
+                viewModel: sidebarViewModel,
+                selectedFileURL: selectedFileURL,
+                onOpenScrapbook: { appState.openScrapbook() }
+            )
+            .navigationSplitViewColumnWidth(min: 200, ideal: 250, max: 400)
         } detail: {
             EditorAreaView(
                 appState: appState,
@@ -70,6 +87,16 @@ struct ContentView: View {
             if let url = appState.pendingLargeFileURL {
                 Text("\(url.lastPathComponent) is larger than 1 MB. Opening large files may affect performance.")
             }
+        }
+        .alert("Close Scrapbook", isPresented: $appState.showCloseScrapbookAlert) {
+            Button("Don't Save", role: .destructive) {
+                appState.confirmCloseScrapbook()
+            }
+            Button("Cancel", role: .cancel) {
+                appState.cancelCloseScrapbook()
+            }
+        } message: {
+            Text("The scrapbook has content. Close without saving?")
         }
         .translationTask(translationViewModel.translationConfig) { session in
             do {
