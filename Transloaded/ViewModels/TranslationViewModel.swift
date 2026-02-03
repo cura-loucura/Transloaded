@@ -71,12 +71,15 @@ class TranslationViewModel {
         triggerNextDownload()
     }
 
+    var onAllDownloadsComplete: (() -> Void)?
+
     private func triggerNextDownload() {
         guard let next = pendingDownloadLegs.first else {
             // All downloads complete
             translationStatus = ""
             isPreparingTranslation = false
             translationConfig = nil
+            onAllDownloadsComplete?()
             return
         }
 

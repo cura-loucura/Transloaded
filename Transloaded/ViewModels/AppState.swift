@@ -13,8 +13,11 @@ class AppState {
     private let fileSystemService = FileSystemService()
     private let fileWatcherService = FileWatcherService()
     var translationService: TranslationService?
+    var translationViewModel: TranslationViewModel?
     var settingsState: SettingsState?
     var recentItemsManager: RecentItemsManager?
+
+    private var panelsPendingDownload: Set<UUID> = []
 
     // Error alert state
     var showError: Bool = false
@@ -186,6 +189,14 @@ class AppState {
         translateContent(panelID: panelID)
     }
 
+    func retryPendingDownloads() {
+        let pending = panelsPendingDownload
+        panelsPendingDownload.removeAll()
+        for panelID in pending {
+            translateContent(panelID: panelID)
+        }
+    }
+
     private func retranslateAllPanels(for fileID: UUID) {
         for panel in translationPanels where panel.fileID == fileID {
             translateContent(panelID: panel.id)
@@ -215,6 +226,17 @@ class AppState {
                 if let idx = translationPanels.firstIndex(where: { $0.id == panelID }) {
                     translationPanels[idx].translatedContent = translated
                     translationPanels[idx].isTranslating = false
+                }
+            } catch let translationError as TranslationError {
+                if case .downloadRequired(let src, let tgt) = translationError {
+                    // Keep panel in translating state while downloading
+                    panelsPendingDownload.insert(panelID)
+                    await translationViewModel?.prepareTranslation(from: src, to: tgt)
+                } else {
+                    if let idx = translationPanels.firstIndex(where: { $0.id == panelID }) {
+                        translationPanels[idx].error = translationError.localizedDescription
+                        translationPanels[idx].isTranslating = false
+                    }
                 }
             } catch {
                 if let idx = translationPanels.firstIndex(where: { $0.id == panelID }) {

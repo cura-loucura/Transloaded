@@ -25,9 +25,13 @@ struct TransloadedApp: App {
             )
             .onAppear {
                 appState.translationService = translationViewModel.translationService
+                appState.translationViewModel = translationViewModel
                 appState.settingsState = settingsState
                 appState.recentItemsManager = recentItemsManager
                 sidebarViewModel.recentItemsManager = recentItemsManager
+                translationViewModel.onAllDownloadsComplete = { [weak appState] in
+                    appState?.retryPendingDownloads()
+                }
             }
         }
         .defaultSize(width: 1200, height: 800)
