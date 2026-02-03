@@ -12,6 +12,11 @@ class SettingsState {
     private static let lastTargetLanguageKey = "lastTargetLanguage"
     private static let editorFontNameKey = "editorFontName"
     private static let editorFontSizeKey = "editorFontSize"
+    private static let rememberOpenItemsKey = "rememberOpenItems"
+
+    private static let sessionSidebarBookmarksKey = "sessionSidebarBookmarks"
+    private static let sessionOpenFileBookmarksKey = "sessionOpenFileBookmarks"
+    private static let sessionActiveFileBookmarkKey = "sessionActiveFileBookmark"
 
     let allLanguages: [SupportedLanguage] = SupportedLanguage.allCases
 
@@ -58,6 +63,15 @@ class SettingsState {
     var editorFontSize: Double {
         didSet {
             UserDefaults.standard.set(editorFontSize, forKey: Self.editorFontSizeKey)
+        }
+    }
+
+    var rememberOpenItems: Bool {
+        didSet {
+            UserDefaults.standard.set(rememberOpenItems, forKey: Self.rememberOpenItemsKey)
+            if !rememberOpenItems {
+                clearSessionData()
+            }
         }
     }
 
@@ -111,6 +125,13 @@ class SettingsState {
         self.editorFontName = UserDefaults.standard.string(forKey: Self.editorFontNameKey) ?? ""
         let storedSize = UserDefaults.standard.double(forKey: Self.editorFontSizeKey)
         self.editorFontSize = storedSize > 0 ? storedSize : 13
+
+        // Load session restore setting (default: true)
+        if UserDefaults.standard.object(forKey: Self.rememberOpenItemsKey) != nil {
+            self.rememberOpenItems = UserDefaults.standard.bool(forKey: Self.rememberOpenItemsKey)
+        } else {
+            self.rememberOpenItems = true
+        }
     }
 
     func toggleLanguage(_ language: SupportedLanguage) {
@@ -130,5 +151,11 @@ class SettingsState {
     private func saveActiveLanguages() {
         let rawValues = activeLanguages.map(\.rawValue)
         UserDefaults.standard.set(rawValues, forKey: Self.activeLanguagesKey)
+    }
+
+    func clearSessionData() {
+        UserDefaults.standard.removeObject(forKey: Self.sessionSidebarBookmarksKey)
+        UserDefaults.standard.removeObject(forKey: Self.sessionOpenFileBookmarksKey)
+        UserDefaults.standard.removeObject(forKey: Self.sessionActiveFileBookmarkKey)
     }
 }

@@ -1,8 +1,59 @@
 import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    var appState: AppState?
+    var sidebarViewModel: SidebarViewModel?
+    var settingsState: SettingsState?
+
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         true
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        saveSession()
+    }
+
+    @MainActor
+    private func saveSession() {
+        guard let settingsState, settingsState.rememberOpenItems else {
+            settingsState?.clearSessionData()
+            return
+        }
+
+        // Save sidebar roots as security-scoped bookmarks
+        let sidebarBookmarks: [Data] = (sidebarViewModel?.roots ?? []).compactMap { item in
+            try? item.url.bookmarkData(
+                options: .withSecurityScope,
+                includingResourceValuesForKeys: nil,
+                relativeTo: nil
+            )
+        }
+        UserDefaults.standard.set(sidebarBookmarks, forKey: "sessionSidebarBookmarks")
+
+        // Save open file URLs (excluding scrapbook) as security-scoped bookmarks
+        let openFileBookmarks: [Data] = (appState?.openFiles ?? [])
+            .filter { !$0.isScrapbook }
+            .compactMap { file in
+                try? file.url.bookmarkData(
+                    options: .withSecurityScope,
+                    includingResourceValuesForKeys: nil,
+                    relativeTo: nil
+                )
+            }
+        UserDefaults.standard.set(openFileBookmarks, forKey: "sessionOpenFileBookmarks")
+
+        // Save active file bookmark
+        if let activeFile = appState?.activeFile, !activeFile.isScrapbook {
+            if let data = try? activeFile.url.bookmarkData(
+                options: .withSecurityScope,
+                includingResourceValuesForKeys: nil,
+                relativeTo: nil
+            ) {
+                UserDefaults.standard.set(data, forKey: "sessionActiveFileBookmark")
+            }
+        } else {
+            UserDefaults.standard.removeObject(forKey: "sessionActiveFileBookmark")
+        }
     }
 }
 
@@ -32,6 +83,11 @@ struct TransloadedApp: App {
                 translationViewModel.onAllDownloadsComplete = { [weak appState] in
                     appState?.retryPendingDownloads()
                 }
+
+                appDelegate.appState = appState
+                appDelegate.sidebarViewModel = sidebarViewModel
+                appDelegate.settingsState = settingsState
+                restoreSession()
             }
         }
         .defaultSize(width: 1200, height: 800)
@@ -106,6 +162,80 @@ struct TransloadedApp: App {
 
         Settings {
             SettingsView(settingsState: settingsState)
+        }
+    }
+
+    private func restoreSession() {
+        guard settingsState.rememberOpenItems else { return }
+
+        // Restore sidebar roots
+        var validSidebarBookmarks: [Data] = []
+        if let dataArray = UserDefaults.standard.array(forKey: "sessionSidebarBookmarks") as? [Data] {
+            for data in dataArray {
+                var isStale = false
+                guard let url = try? URL(
+                    resolvingBookmarkData: data,
+                    options: .withSecurityScope,
+                    relativeTo: nil,
+                    bookmarkDataIsStale: &isStale
+                ) else { continue }
+                guard FileManager.default.fileExists(atPath: url.path) else { continue }
+                _ = url.startAccessingSecurityScopedResource()
+                sidebarViewModel.addURLs([url])
+                if isStale, let freshData = try? url.bookmarkData(
+                    options: .withSecurityScope,
+                    includingResourceValuesForKeys: nil,
+                    relativeTo: nil
+                ) {
+                    validSidebarBookmarks.append(freshData)
+                } else {
+                    validSidebarBookmarks.append(data)
+                }
+            }
+            UserDefaults.standard.set(validSidebarBookmarks, forKey: "sessionSidebarBookmarks")
+        }
+
+        // Restore open files
+        var validFileBookmarks: [Data] = []
+        if let dataArray = UserDefaults.standard.array(forKey: "sessionOpenFileBookmarks") as? [Data] {
+            for data in dataArray {
+                var isStale = false
+                guard let url = try? URL(
+                    resolvingBookmarkData: data,
+                    options: .withSecurityScope,
+                    relativeTo: nil,
+                    bookmarkDataIsStale: &isStale
+                ) else { continue }
+                guard FileManager.default.fileExists(atPath: url.path) else { continue }
+                _ = url.startAccessingSecurityScopedResource()
+                appState.restoreFile(url: url)
+                if isStale, let freshData = try? url.bookmarkData(
+                    options: .withSecurityScope,
+                    includingResourceValuesForKeys: nil,
+                    relativeTo: nil
+                ) {
+                    validFileBookmarks.append(freshData)
+                } else {
+                    validFileBookmarks.append(data)
+                }
+            }
+            UserDefaults.standard.set(validFileBookmarks, forKey: "sessionOpenFileBookmarks")
+        }
+
+        // Restore active file
+        if let data = UserDefaults.standard.data(forKey: "sessionActiveFileBookmark") {
+            var isStale = false
+            if let url = try? URL(
+                resolvingBookmarkData: data,
+                options: .withSecurityScope,
+                relativeTo: nil,
+                bookmarkDataIsStale: &isStale
+            ) {
+                _ = url.startAccessingSecurityScopedResource()
+                if let match = appState.openFiles.first(where: { $0.url == url }) {
+                    appState.activeFileID = match.id
+                }
+            }
         }
     }
 

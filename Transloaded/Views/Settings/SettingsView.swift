@@ -58,6 +58,13 @@ struct SettingsView: View {
 
     private var generalTab: some View {
         Form {
+            Section("Session") {
+                Toggle("Remember open files and directories", isOn: $settingsState.rememberOpenItems)
+                Text("Restore previously open sidebar items and editor tabs when the app launches.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Default Source Language") {
                 Picker("When auto-detection fails, use:", selection: $settingsState.defaultSourceLanguage) {
                     Text("None (require manual selection)")

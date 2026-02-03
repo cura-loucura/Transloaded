@@ -70,6 +70,32 @@ class AppState {
         showLargeFileAlert = false
     }
 
+    /// Opens a file without triggering auto-translate, used during session restore.
+    func restoreFile(url: URL) {
+        if openFiles.contains(where: { $0.url == url }) { return }
+
+        do {
+            let content = try fileSystemService.readFileContent(at: url)
+            let detected = detectLanguage(for: content) ?? settingsState?.defaultSourceLanguage
+            let file = OpenFile(
+                url: url,
+                name: url.lastPathComponent,
+                content: content,
+                detectedLanguage: detected
+            )
+            openFiles.append(file)
+            activeFileID = file.id
+
+            fileWatcherService.watch(url: url) { [weak self] changedURL in
+                Task { @MainActor in
+                    self?.markFileAsExternallyModified(url: changedURL)
+                }
+            }
+        } catch {
+            // Silently skip files that can't be read during restore
+        }
+    }
+
     private func performOpenFile(url: URL) {
         do {
             let content = try fileSystemService.readFileContent(at: url)
