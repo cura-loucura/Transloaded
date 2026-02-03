@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 @Observable
 @MainActor
@@ -9,6 +10,8 @@ class SettingsState {
     private static let defaultTargetLanguageKey = "defaultTargetLanguage"
     private static let lastSourceLanguageKey = "lastSourceLanguage"
     private static let lastTargetLanguageKey = "lastTargetLanguage"
+    private static let editorFontNameKey = "editorFontName"
+    private static let editorFontSizeKey = "editorFontSize"
 
     let allLanguages: [SupportedLanguage] = SupportedLanguage.allCases
 
@@ -43,6 +46,26 @@ class SettingsState {
     var lastTargetLanguage: SupportedLanguage? {
         didSet {
             UserDefaults.standard.set(lastTargetLanguage?.rawValue, forKey: Self.lastTargetLanguageKey)
+        }
+    }
+
+    var editorFontName: String {
+        didSet {
+            UserDefaults.standard.set(editorFontName, forKey: Self.editorFontNameKey)
+        }
+    }
+
+    var editorFontSize: Double {
+        didSet {
+            UserDefaults.standard.set(editorFontSize, forKey: Self.editorFontSizeKey)
+        }
+    }
+
+    var editorFont: Font {
+        if editorFontName.isEmpty {
+            return .system(size: CGFloat(editorFontSize), design: .monospaced)
+        } else {
+            return .custom(editorFontName, size: CGFloat(editorFontSize))
         }
     }
 
@@ -83,6 +106,11 @@ class SettingsState {
         } else {
             self.lastTargetLanguage = nil
         }
+
+        // Load editor font settings
+        self.editorFontName = UserDefaults.standard.string(forKey: Self.editorFontNameKey) ?? ""
+        let storedSize = UserDefaults.standard.double(forKey: Self.editorFontSizeKey)
+        self.editorFontSize = storedSize > 0 ? storedSize : 13
     }
 
     func toggleLanguage(_ language: SupportedLanguage) {

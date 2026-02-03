@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TranslationPanelView: View {
     let panel: TranslationPanel
+    var font: Font = .system(.body, design: .monospaced)
     let onClose: () -> Void
     let onRetry: () -> Void
 
@@ -67,7 +68,7 @@ struct TranslationPanelView: View {
         } else {
             ScrollView([.horizontal, .vertical]) {
                 Text(panel.translatedContent)
-                    .font(.system(.body, design: .monospaced))
+                    .font(font)
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()

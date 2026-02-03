@@ -4,6 +4,9 @@ A native macOS file translation app powered by Apple's on-device Translation fra
 
 ![macOS 15+](https://img.shields.io/badge/macOS-15%2B-blue) ![Swift 6](https://img.shields.io/badge/Swift-6-orange) ![On-Device](https://img.shields.io/badge/translation-on--device-green)
 
+
+![App](./assets/capture_this.png)
+
 ## What It Does
 
 Transloaded lets you open text-based files and instantly translate them into any of 20 supported languages. Translations appear in side-by-side panels next to the original content. Everything runs locally on your Mac using Apple's Translation framework — no cloud services, no API keys, no data leaving your machine.

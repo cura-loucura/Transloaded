@@ -66,6 +66,52 @@ struct ContentView: View {
                 }
                 .help("Save Translation")
                 .disabled(appState.activeTranslationPanelID == nil)
+
+                Menu {
+                    let fontFamilies: [(name: String, label: String)] = [
+                        ("", "System Monospaced"),
+                        ("Menlo", "Menlo"),
+                        ("SF Mono", "SF Mono"),
+                        ("Monaco", "Monaco"),
+                        ("Courier New", "Courier New"),
+                        ("Andale Mono", "Andale Mono")
+                    ]
+                    ForEach(fontFamilies, id: \.name) { font in
+                        Button {
+                            settingsState.editorFontName = font.name
+                        } label: {
+                            HStack {
+                                Text(font.label)
+                                if settingsState.editorFontName == font.name {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        }
+                    }
+
+                    Divider()
+
+                    HStack {
+                        Button {
+                            if settingsState.editorFontSize > 9 {
+                                settingsState.editorFontSize -= 1
+                            }
+                        } label: {
+                            Label("Decrease Size", systemImage: "minus")
+                        }
+
+                        Button {
+                            if settingsState.editorFontSize < 36 {
+                                settingsState.editorFontSize += 1
+                            }
+                        } label: {
+                            Label("Increase Size", systemImage: "plus")
+                        }
+                    }
+                } label: {
+                    Label("Font", systemImage: "textformat.size")
+                }
+                .help("Font Settings")
             }
         }
         .onDrop(of: [.fileURL], isTargeted: nil) { providers in

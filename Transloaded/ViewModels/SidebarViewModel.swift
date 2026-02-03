@@ -57,6 +57,13 @@ class SidebarViewModel {
             guard !roots.contains(where: { $0.url == url }) else { continue }
             let item = fileSystemService.loadDirectory(at: url)
             roots.append(item)
+
+            let isDir = (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
+            if isDir {
+                recentItemsManager?.addRecentFolder(url)
+            } else {
+                recentItemsManager?.addRecentFile(url)
+            }
         }
     }
 }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FileContentView: View {
     let file: OpenFile?
+    var font: Font = .system(.body, design: .monospaced)
     var onReload: ((UUID) -> Void)?
     var onDismissReload: ((UUID) -> Void)?
     var onScrapbookContentChange: ((String) -> Void)?
@@ -24,7 +25,7 @@ struct FileContentView: View {
 
     private func scrapbookEditor(for file: OpenFile) -> some View {
         TextEditor(text: $scrapbookText)
-            .font(.system(.body, design: .monospaced))
+            .font(font)
             .focused($isScrapbookFocused)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .onAppear {
@@ -48,7 +49,7 @@ struct FileContentView: View {
 
             ScrollView([.horizontal, .vertical]) {
                 Text(file.content)
-                    .font(.system(.body, design: .monospaced))
+                    .font(font)
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()

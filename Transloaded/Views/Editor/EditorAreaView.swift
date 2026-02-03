@@ -134,6 +134,7 @@ struct EditorAreaView: View {
                 ForEach(panels) { panel in
                     TranslationPanelView(
                         panel: panel,
+                        font: settingsState.editorFont,
                         onClose: { appState.closeTranslation(id: panel.id) },
                         onRetry: { appState.retryTranslation(panelID: panel.id) }
                     )
@@ -145,6 +146,7 @@ struct EditorAreaView: View {
     private var fileContentView: some View {
         FileContentView(
             file: appState.activeFile,
+            font: settingsState.editorFont,
             onReload: { id in appState.reloadFile(id: id) },
             onDismissReload: { id in appState.dismissReloadBanner(id: id) },
             onScrapbookContentChange: { content in appState.updateScrapbookContent(content) },
