@@ -118,4 +118,5 @@ Open **Transloaded > Settings** (Cmd+,) to configure:
 1. Right-To-Left as well as Vertical Text support
 2. PDF and Image Text extraction and translation
 3. Camera Scanner import
+4. HomeBrew installation support
 
