@@ -5,7 +5,7 @@ A native macOS file translation app powered by Apple's on-device Translation fra
 ![macOS 15+](https://img.shields.io/badge/macOS-15%2B-blue) ![Swift 6](https://img.shields.io/badge/Swift-6-orange) ![On-Device](https://img.shields.io/badge/translation-on--device-green)
 
 
-![App](./assets/capture_this.png)
+![App](./assets/transloaded_main.png)
 
 ## What It Does
 
