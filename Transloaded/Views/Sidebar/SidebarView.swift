@@ -80,6 +80,15 @@ struct SidebarFileItemView: View {
             } label: {
                 Label(item.name, systemImage: "folder.fill")
                     .foregroundStyle(isRoot ? .primary : .secondary)
+                    .padding(.vertical, 1)
+                    .padding(.horizontal, 2)
+                    .background(
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(isHovered ? Color.primary.opacity(0.06) : Color.clear)
+                    )
+                    .onHover { hovering in
+                        isHovered = hovering
+                    }
             }
             .contextMenu {
                 if isRoot {

@@ -70,6 +70,21 @@ struct SettingsView: View {
                 }
             }
 
+            Section("Default Translation Language") {
+                Picker("Auto-open translation panel for:", selection: $settingsState.defaultTargetLanguage) {
+                    Text("None (don't auto-translate)")
+                        .tag(SupportedLanguage?.none)
+                    Divider()
+                    ForEach(settingsState.activeLanguages) { lang in
+                        Text(lang.displayName)
+                            .tag(Optional(lang))
+                    }
+                }
+                Text("When a file is opened, automatically add a translation panel for this language (unless it matches the source).")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Save Naming Pattern") {
                 TextField("Pattern", text: $settingsState.translationSavePattern)
                     .textFieldStyle(.roundedBorder)

@@ -6,10 +6,11 @@ class SettingsState {
     private static let activeLanguagesKey = "activeLanguages"
     private static let defaultSourceLanguageKey = "defaultSourceLanguage"
     private static let savePatternKey = "translationSavePattern"
+    private static let defaultTargetLanguageKey = "defaultTargetLanguage"
     private static let lastSourceLanguageKey = "lastSourceLanguage"
     private static let lastTargetLanguageKey = "lastTargetLanguage"
 
-    let allLanguages: [SupportedLanguage] = SupportedLanguage.defaultActive
+    let allLanguages: [SupportedLanguage] = SupportedLanguage.allCases
 
     var activeLanguages: [SupportedLanguage] {
         didSet { saveActiveLanguages() }
@@ -18,6 +19,12 @@ class SettingsState {
     var defaultSourceLanguage: SupportedLanguage? {
         didSet {
             UserDefaults.standard.set(defaultSourceLanguage?.rawValue, forKey: Self.defaultSourceLanguageKey)
+        }
+    }
+
+    var defaultTargetLanguage: SupportedLanguage? {
+        didSet {
+            UserDefaults.standard.set(defaultTargetLanguage?.rawValue, forKey: Self.defaultTargetLanguageKey)
         }
     }
 
@@ -53,6 +60,13 @@ class SettingsState {
             self.defaultSourceLanguage = SupportedLanguage(rawValue: raw)
         } else {
             self.defaultSourceLanguage = nil
+        }
+
+        // Load default target language
+        if let raw = UserDefaults.standard.string(forKey: Self.defaultTargetLanguageKey) {
+            self.defaultTargetLanguage = SupportedLanguage(rawValue: raw)
+        } else {
+            self.defaultTargetLanguage = nil
         }
 
         // Load save pattern

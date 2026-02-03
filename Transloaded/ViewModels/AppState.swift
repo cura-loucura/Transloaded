@@ -80,6 +80,13 @@ class AppState {
             openFiles.append(file)
             activeFileID = file.id
             recentItemsManager?.addRecentFile(url)
+
+            // Auto-open translation panel if default target language is set and differs from source
+            if let targetLang = settingsState?.defaultTargetLanguage,
+               targetLang != detected {
+                addTranslation(for: file.id, language: targetLang)
+            }
+
             fileWatcherService.watch(url: url) { [weak self] changedURL in
                 Task { @MainActor in
                     self?.markFileAsExternallyModified(url: changedURL)
