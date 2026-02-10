@@ -16,6 +16,11 @@ actor OCRService {
         request.recognitionLevel = .accurate
         request.usesLanguageCorrection = true
 
+        // Enable all supported languages so CJK scripts (Japanese, Chinese, Korean) are recognized
+        let supportedLanguages = try request.supportedRecognitionLanguages()
+        request.recognitionLanguages = supportedLanguages
+        request.automaticallyDetectsLanguage = true
+
         let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
         try handler.perform([request])
 
