@@ -169,12 +169,10 @@ Most of the complexity is handled by Apple. The app only needs to register as a 
 
 ---
 
-## Implementation Roadmap
+## Implementation Status
 
-All three features build on each other naturally:
+All three features have been implemented:
 
-1. **PDF text extraction** (PDFKit) — foundation layer, moderate effort
-2. **Vision OCR** (scanned PDFs + images) — shared pipeline, significant effort
-3. **Continuity Camera** (iPhone import) — lightweight integration on top of existing OCR and file watching
-
-Each layer is independently useful and shippable. The OCR pipeline is the core investment that unlocks both image support and the full Continuity Camera workflow.
+1. **Image OCR** (Vision) — `OCRService` actor, image preview + extracted text in `FileContentView`, auto-translate on open. DONE
+2. **PDF text extraction** (PDFKit + Vision OCR fallback) — `PDFService` actor, `PDFKitView` preview, native extraction with OCR fallback for scanned PDFs. DONE
+3. **Continuity Camera** (iPhone import) — `CameraImportService` for saving images, `ContinuityCameraReceiver` NSView with `NSServicesMenuRequestor`, toolbar button, auto-save to folder + auto-open for OCR. DONE

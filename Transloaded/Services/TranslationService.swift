@@ -1,7 +1,7 @@
 import Foundation
 import Translation
 
-extension TranslationSession: @unchecked Sendable {}
+extension TranslationSession: @retroactive @unchecked Sendable {}
 
 actor TranslationService {
     private var sessions: [String: TranslationSession] = [:]
