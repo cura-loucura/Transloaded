@@ -7,6 +7,7 @@ struct FileItem: Identifiable, Hashable {
     let isDirectory: Bool
     let children: [FileItem]?
     let isTextFile: Bool
+    let isImageFile: Bool
 
     static func == (lhs: FileItem, rhs: FileItem) -> Bool {
         lhs.id == rhs.id

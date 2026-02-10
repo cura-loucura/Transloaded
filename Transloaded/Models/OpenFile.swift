@@ -1,5 +1,10 @@
 import Foundation
 
+enum FileType: Sendable {
+    case text
+    case image
+}
+
 struct OpenFile: Identifiable {
     let id: UUID
     let url: URL
@@ -8,6 +13,9 @@ struct OpenFile: Identifiable {
     var detectedLanguage: SupportedLanguage?
     var selectedSourceLanguage: SupportedLanguage?
     var isExternallyModified: Bool = false
+    var fileType: FileType = .text
+    var sourceImageURL: URL?
+    var ocrConfidence: Float?
 
     static let scrapbookURL = URL(fileURLWithPath: "/dev/null/Scrapbook")
 
@@ -15,13 +23,20 @@ struct OpenFile: Identifiable {
         url == Self.scrapbookURL
     }
 
-    init(url: URL, name: String, content: String, detectedLanguage: SupportedLanguage? = nil) {
+    var isImage: Bool {
+        fileType == .image
+    }
+
+    init(url: URL, name: String, content: String, detectedLanguage: SupportedLanguage? = nil, fileType: FileType = .text, sourceImageURL: URL? = nil, ocrConfidence: Float? = nil) {
         self.id = UUID()
         self.url = url
         self.name = name
         self.content = content
         self.detectedLanguage = detectedLanguage
         self.selectedSourceLanguage = detectedLanguage
+        self.fileType = fileType
+        self.sourceImageURL = sourceImageURL
+        self.ocrConfidence = ocrConfidence
     }
 
     static func newScrapbook() -> OpenFile {

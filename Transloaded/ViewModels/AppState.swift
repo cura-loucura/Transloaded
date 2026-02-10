@@ -12,6 +12,7 @@ class AppState {
 
     private let fileSystemService = FileSystemService()
     private let fileWatcherService = FileWatcherService()
+    private let ocrService = OCRService()
     var translationService: TranslationService?
     var translationViewModel: TranslationViewModel?
     var settingsState: SettingsState?
@@ -74,6 +75,14 @@ class AppState {
     func restoreFile(url: URL) {
         if openFiles.contains(where: { $0.url == url }) { return }
 
+        if fileSystemService.isImageFile(at: url) {
+            restoreImageFile(url: url)
+        } else {
+            restoreTextFile(url: url)
+        }
+    }
+
+    private func restoreTextFile(url: URL) {
         do {
             let content = try fileSystemService.readFileContent(at: url)
             let detected = detectLanguage(for: content) ?? settingsState?.defaultSourceLanguage
@@ -96,7 +105,49 @@ class AppState {
         }
     }
 
+    private func restoreImageFile(url: URL) {
+        let file = OpenFile(
+            url: url,
+            name: url.lastPathComponent,
+            content: "",
+            fileType: .image,
+            sourceImageURL: url
+        )
+        openFiles.append(file)
+        activeFileID = file.id
+
+        let fileID = file.id
+        Task {
+            do {
+                let result = try await ocrService.recognizeText(in: url)
+                guard let index = openFiles.firstIndex(where: { $0.id == fileID }) else { return }
+                openFiles[index].content = result.text
+                openFiles[index].ocrConfidence = result.confidence
+
+                let detected = detectLanguage(for: result.text) ?? settingsState?.defaultSourceLanguage
+                openFiles[index].detectedLanguage = detected
+                openFiles[index].selectedSourceLanguage = detected
+            } catch {
+                // Silently skip images that can't be OCR'd during restore
+            }
+        }
+
+        fileWatcherService.watch(url: url) { [weak self] changedURL in
+            Task { @MainActor in
+                self?.markFileAsExternallyModified(url: changedURL)
+            }
+        }
+    }
+
     private func performOpenFile(url: URL) {
+        if fileSystemService.isImageFile(at: url) {
+            performOpenImageFile(url: url)
+        } else {
+            performOpenTextFile(url: url)
+        }
+    }
+
+    private func performOpenTextFile(url: URL) {
         do {
             let content = try fileSystemService.readFileContent(at: url)
             let detected = detectLanguage(for: content) ?? settingsState?.defaultSourceLanguage
@@ -124,6 +175,49 @@ class AppState {
         } catch {
             errorMessage = "Failed to open \(url.lastPathComponent): \(error.localizedDescription)"
             showError = true
+        }
+    }
+
+    private func performOpenImageFile(url: URL) {
+        // Create file entry immediately with empty content so the UI can show a loading state
+        let file = OpenFile(
+            url: url,
+            name: url.lastPathComponent,
+            content: "",
+            fileType: .image,
+            sourceImageURL: url
+        )
+        openFiles.append(file)
+        activeFileID = file.id
+        recentItemsManager?.addRecentFile(url)
+
+        let fileID = file.id
+        Task {
+            do {
+                let result = try await ocrService.recognizeText(in: url)
+                guard let index = openFiles.firstIndex(where: { $0.id == fileID }) else { return }
+                openFiles[index].content = result.text
+                openFiles[index].ocrConfidence = result.confidence
+
+                let detected = detectLanguage(for: result.text) ?? settingsState?.defaultSourceLanguage
+                openFiles[index].detectedLanguage = detected
+                openFiles[index].selectedSourceLanguage = detected
+
+                // Auto-open translation panel if default target language is set and differs from source
+                if let targetLang = settingsState?.defaultTargetLanguage,
+                   targetLang != detected {
+                    addTranslation(for: fileID, language: targetLang)
+                }
+            } catch {
+                errorMessage = "Failed to extract text from \(url.lastPathComponent): \(error.localizedDescription)"
+                showError = true
+            }
+        }
+
+        fileWatcherService.watch(url: url) { [weak self] changedURL in
+            Task { @MainActor in
+                self?.markFileAsExternallyModified(url: changedURL)
+            }
         }
     }
 
@@ -164,6 +258,15 @@ class AppState {
     func reloadFile(id: UUID) {
         guard let index = openFiles.firstIndex(where: { $0.id == id }) else { return }
         let url = openFiles[index].url
+
+        if openFiles[index].fileType == .image {
+            reloadImageFile(id: id, url: url, index: index)
+        } else {
+            reloadTextFile(id: id, url: url, index: index)
+        }
+    }
+
+    private func reloadTextFile(id: UUID, url: URL, index: Int) {
         do {
             let content = try fileSystemService.readFileContent(at: url)
             openFiles[index].content = content
@@ -175,6 +278,27 @@ class AppState {
         } catch {
             errorMessage = "Failed to reload \(url.lastPathComponent): \(error.localizedDescription)"
             showError = true
+        }
+    }
+
+    private func reloadImageFile(id: UUID, url: URL, index: Int) {
+        openFiles[index].isExternallyModified = false
+
+        Task {
+            do {
+                let result = try await ocrService.recognizeText(in: url)
+                guard let idx = openFiles.firstIndex(where: { $0.id == id }) else { return }
+                openFiles[idx].content = result.text
+                openFiles[idx].ocrConfidence = result.confidence
+
+                let detected = detectLanguage(for: result.text)
+                openFiles[idx].detectedLanguage = detected
+
+                retranslateAllPanels(for: id)
+            } catch {
+                errorMessage = "Failed to extract text from \(url.lastPathComponent): \(error.localizedDescription)"
+                showError = true
+            }
         }
     }
 

@@ -15,7 +15,8 @@ struct FileSystemService {
                 name: name,
                 isDirectory: false,
                 children: nil,
-                isTextFile: isTextFile(at: url)
+                isTextFile: isTextFile(at: url),
+                isImageFile: isImageFile(at: url)
             )
         }
 
@@ -39,7 +40,8 @@ struct FileSystemService {
             name: name,
             isDirectory: true,
             children: children,
-            isTextFile: false
+            isTextFile: false,
+            isImageFile: false
         )
     }
 
@@ -69,5 +71,17 @@ struct FileSystemService {
         ]
 
         return textExtensions.contains(url.pathExtension.lowercased())
+    }
+
+    func isImageFile(at url: URL) -> Bool {
+        if let type = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType {
+            return type.conforms(to: .image)
+        }
+
+        let imageExtensions: Set<String> = [
+            "png", "jpg", "jpeg", "tiff", "tif", "heic", "heif", "bmp"
+        ]
+
+        return imageExtensions.contains(url.pathExtension.lowercased())
     }
 }
