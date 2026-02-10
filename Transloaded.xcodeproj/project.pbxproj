@@ -25,8 +25,10 @@
 		932F6026C5313B1793255EF4 /* TransloadedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2627E87F7E3AF1223E2A2D1A /* TransloadedApp.swift */; };
 		BA50A0E27ED6FF25E6E5D465 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1C14B169DB4103AA755EC0A8 /* Preview Assets.xcassets */; };
 		C599F976FF5FE88C130F64E5 /* RecentItemsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4F04861E45A9074EC67F19 /* RecentItemsManager.swift */; };
+		C5A48D49B110130CC354613F /* PDFService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C830EA29FD2BE4279C627D47 /* PDFService.swift */; };
 		C60CB08644BC45898044C6A6 /* TranslationPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D3E3261C0C15990BAE45D4 /* TranslationPanelView.swift */; };
 		C7325A12F4914C7241A12972 /* TranslationPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6583AC63503A78DB6584C0E7 /* TranslationPanel.swift */; };
+		CE96FE49E63103459ACBF496 /* PDFKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A244AE693C78C21D116572 /* PDFKitView.swift */; };
 		D863EF12DCE656AFF566345C /* SettingsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD90D58D1B9E48AE53327498 /* SettingsState.swift */; };
 		F0AE228488EAFC3FA1D0BF1C /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21FFCB8674106B0EA5CC9E11 /* OCRService.swift */; };
 		F43E764E3E73155E0ED4CC39 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E608BBA51627EBE0B491C3D9 /* AppState.swift */; };
@@ -52,9 +54,11 @@
 		9B540175DC8EEA018B86F597 /* FileContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileContentView.swift; sourceTree = "<group>"; };
 		9BF7ABB473FE6CB69E328EA6 /* FileSystemService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemService.swift; sourceTree = "<group>"; };
 		9EA1E371637D34F557E7B1C0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B0A244AE693C78C21D116572 /* PDFKitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFKitView.swift; sourceTree = "<group>"; };
 		B6106F651E858A9AA3C2CAAD /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		BDBFBE96226C02474969198D /* OpenFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenFile.swift; sourceTree = "<group>"; };
 		C613CEC6E5B39BA37AD4117E /* SidebarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarViewModel.swift; sourceTree = "<group>"; };
+		C830EA29FD2BE4279C627D47 /* PDFService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFService.swift; sourceTree = "<group>"; };
 		CD90D58D1B9E48AE53327498 /* SettingsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsState.swift; sourceTree = "<group>"; };
 		E2CA68A4D53F2D1B6F2D468B /* TranslationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationService.swift; sourceTree = "<group>"; };
 		E608BBA51627EBE0B491C3D9 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
@@ -85,6 +89,7 @@
 				9A460677C5B821C4750DABD3 /* EditorAreaView.swift */,
 				9B540175DC8EEA018B86F597 /* FileContentView.swift */,
 				6D369CDC9AC0AB2EE472BA58 /* FileTabBar.swift */,
+				B0A244AE693C78C21D116572 /* PDFKitView.swift */,
 			);
 			path = Editor;
 			sourceTree = "<group>";
@@ -149,6 +154,7 @@
 				9BF7ABB473FE6CB69E328EA6 /* FileSystemService.swift */,
 				0B41CB69547601DDF7FE99E8 /* FileWatcherService.swift */,
 				21FFCB8674106B0EA5CC9E11 /* OCRService.swift */,
+				C830EA29FD2BE4279C627D47 /* PDFService.swift */,
 				EB4F04861E45A9074EC67F19 /* RecentItemsManager.swift */,
 				E2CA68A4D53F2D1B6F2D468B /* TranslationService.swift */,
 			);
@@ -265,6 +271,8 @@
 				2F6371C2CAD84E2B0B2206C5 /* FileWatcherService.swift in Sources */,
 				F0AE228488EAFC3FA1D0BF1C /* OCRService.swift in Sources */,
 				68C3AB485ACAA8D3978B4BA2 /* OpenFile.swift in Sources */,
+				CE96FE49E63103459ACBF496 /* PDFKitView.swift in Sources */,
+				C5A48D49B110130CC354613F /* PDFService.swift in Sources */,
 				C599F976FF5FE88C130F64E5 /* RecentItemsManager.swift in Sources */,
 				D863EF12DCE656AFF566345C /* SettingsState.swift in Sources */,
 				7ED198C5C8FA17CD8D584B39 /* SettingsView.swift in Sources */,

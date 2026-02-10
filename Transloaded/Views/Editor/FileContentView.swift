@@ -15,6 +15,8 @@ struct FileContentView: View {
         if let file {
             if file.isScrapbook {
                 scrapbookEditor(for: file)
+            } else if file.isPDF {
+                pdfContent(for: file)
             } else if file.isImage {
                 imageContent(for: file)
             } else {
@@ -167,6 +169,131 @@ struct FileContentView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .background(Color.yellow.opacity(0.1))
+    }
+
+    // MARK: - PDF File
+
+    private func pdfContent(for file: OpenFile) -> some View {
+        VStack(spacing: 0) {
+            if file.isExternallyModified {
+                reloadBanner(for: file)
+            }
+
+            if let method = file.pdfExtractionMethod {
+                pdfExtractionBanner(method: method, pageCount: file.pdfPageCount)
+            }
+
+            if file.content.isEmpty && file.pdfExtractionMethod == nil {
+                pdfProcessingView
+            } else if file.pdfExtractionMethod == "empty" {
+                pdfEmptyWarning
+            } else {
+                VSplitView {
+                    pdfPreview(for: file)
+                        .frame(minHeight: 150)
+
+                    pdfTextView(for: file)
+                        .frame(minHeight: 80)
+                }
+            }
+        }
+    }
+
+    private func pdfPreview(for file: OpenFile) -> some View {
+        Group {
+            if let pdfURL = file.sourcePDFURL {
+                PDFKitView(url: pdfURL)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                VStack(spacing: 8) {
+                    Image(systemName: "doc.richtext")
+                        .font(.system(size: 24))
+                        .foregroundStyle(.tertiary)
+                    Text("Unable to load PDF preview")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+    }
+
+    private func pdfTextView(for file: OpenFile) -> some View {
+        VStack(spacing: 0) {
+            HStack {
+                Label("Extracted Text", systemImage: "text.viewfinder")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.secondary)
+                Spacer()
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color.primary.opacity(0.04))
+
+            Divider()
+
+            ScrollView([.horizontal, .vertical]) {
+                Text(file.content)
+                    .font(font)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+
+    private func pdfExtractionBanner(method: String, pageCount: Int?) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: method == "ocr" ? "eye.circle.fill" : "doc.text.fill")
+                .foregroundStyle(.blue)
+                .font(.system(size: 12))
+
+            Group {
+                switch method {
+                case "native":
+                    Text("Text extracted from \(pageCount ?? 0) page\(pageCount == 1 ? "" : "s")")
+                case "ocr":
+                    Text("Scanned PDF \u{2014} text extracted via OCR from \(pageCount ?? 0) page\(pageCount == 1 ? "" : "s")")
+                case "empty":
+                    Text("No text could be extracted from this PDF")
+                default:
+                    Text("Text extracted")
+                }
+            }
+            .font(.system(size: 12))
+
+            Spacer()
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(method == "empty" ? Color.yellow.opacity(0.1) : Color.blue.opacity(0.06))
+    }
+
+    private var pdfProcessingView: some View {
+        VStack(spacing: 12) {
+            ProgressView()
+                .controlSize(.large)
+            Text("Extracting text from PDF...")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var pdfEmptyWarning: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "doc.richtext")
+                .font(.system(size: 40))
+                .foregroundStyle(.tertiary)
+            Text("No text extracted")
+                .font(.title3)
+                .foregroundStyle(.secondary)
+            Text("This PDF may contain only images or unsupported content.")
+                .font(.subheadline)
+                .foregroundStyle(.tertiary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Banners

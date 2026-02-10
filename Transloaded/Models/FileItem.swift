@@ -8,6 +8,7 @@ struct FileItem: Identifiable, Hashable {
     let children: [FileItem]?
     let isTextFile: Bool
     let isImageFile: Bool
+    let isPDFFile: Bool
 
     static func == (lhs: FileItem, rhs: FileItem) -> Bool {
         lhs.id == rhs.id

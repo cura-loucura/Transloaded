@@ -48,7 +48,7 @@ class SidebarViewModel {
     }
 
     func handleDoubleClick(on item: FileItem) {
-        guard !item.isDirectory, item.isTextFile || item.isImageFile else { return }
+        guard !item.isDirectory, item.isTextFile || item.isImageFile || item.isPDFFile else { return }
         onFileDoubleClick?(item.url)
     }
 

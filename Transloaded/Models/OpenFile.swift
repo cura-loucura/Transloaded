@@ -3,6 +3,7 @@ import Foundation
 enum FileType: Sendable {
     case text
     case image
+    case pdf
 }
 
 struct OpenFile: Identifiable {
@@ -16,6 +17,9 @@ struct OpenFile: Identifiable {
     var fileType: FileType = .text
     var sourceImageURL: URL?
     var ocrConfidence: Float?
+    var sourcePDFURL: URL?
+    var pdfPageCount: Int?
+    var pdfExtractionMethod: String?
 
     static let scrapbookURL = URL(fileURLWithPath: "/dev/null/Scrapbook")
 
@@ -27,7 +31,11 @@ struct OpenFile: Identifiable {
         fileType == .image
     }
 
-    init(url: URL, name: String, content: String, detectedLanguage: SupportedLanguage? = nil, fileType: FileType = .text, sourceImageURL: URL? = nil, ocrConfidence: Float? = nil) {
+    var isPDF: Bool {
+        fileType == .pdf
+    }
+
+    init(url: URL, name: String, content: String, detectedLanguage: SupportedLanguage? = nil, fileType: FileType = .text, sourceImageURL: URL? = nil, ocrConfidence: Float? = nil, sourcePDFURL: URL? = nil, pdfPageCount: Int? = nil, pdfExtractionMethod: String? = nil) {
         self.id = UUID()
         self.url = url
         self.name = name
@@ -37,6 +45,9 @@ struct OpenFile: Identifiable {
         self.fileType = fileType
         self.sourceImageURL = sourceImageURL
         self.ocrConfidence = ocrConfidence
+        self.sourcePDFURL = sourcePDFURL
+        self.pdfPageCount = pdfPageCount
+        self.pdfExtractionMethod = pdfExtractionMethod
     }
 
     static func newScrapbook() -> OpenFile {

@@ -13,6 +13,7 @@ class AppState {
     private let fileSystemService = FileSystemService()
     private let fileWatcherService = FileWatcherService()
     private let ocrService = OCRService()
+    private let pdfService = PDFService()
     var translationService: TranslationService?
     var translationViewModel: TranslationViewModel?
     var settingsState: SettingsState?
@@ -75,7 +76,9 @@ class AppState {
     func restoreFile(url: URL) {
         if openFiles.contains(where: { $0.url == url }) { return }
 
-        if fileSystemService.isImageFile(at: url) {
+        if fileSystemService.isPDFFile(at: url) {
+            restorePDFFile(url: url)
+        } else if fileSystemService.isImageFile(at: url) {
             restoreImageFile(url: url)
         } else {
             restoreTextFile(url: url)
@@ -139,8 +142,45 @@ class AppState {
         }
     }
 
+    private func restorePDFFile(url: URL) {
+        let file = OpenFile(
+            url: url,
+            name: url.lastPathComponent,
+            content: "",
+            fileType: .pdf,
+            sourcePDFURL: url
+        )
+        openFiles.append(file)
+        activeFileID = file.id
+
+        let fileID = file.id
+        Task {
+            do {
+                let result = try await pdfService.extractText(from: url)
+                guard let index = openFiles.firstIndex(where: { $0.id == fileID }) else { return }
+                openFiles[index].content = result.text
+                openFiles[index].pdfPageCount = result.pageCount
+                openFiles[index].pdfExtractionMethod = result.extractionMethod.rawValue
+
+                let detected = detectLanguage(for: result.text) ?? settingsState?.defaultSourceLanguage
+                openFiles[index].detectedLanguage = detected
+                openFiles[index].selectedSourceLanguage = detected
+            } catch {
+                // Silently skip PDFs that can't be read during restore
+            }
+        }
+
+        fileWatcherService.watch(url: url) { [weak self] changedURL in
+            Task { @MainActor in
+                self?.markFileAsExternallyModified(url: changedURL)
+            }
+        }
+    }
+
     private func performOpenFile(url: URL) {
-        if fileSystemService.isImageFile(at: url) {
+        if fileSystemService.isPDFFile(at: url) {
+            performOpenPDFFile(url: url)
+        } else if fileSystemService.isImageFile(at: url) {
             performOpenImageFile(url: url)
         } else {
             performOpenTextFile(url: url)
@@ -221,6 +261,48 @@ class AppState {
         }
     }
 
+    private func performOpenPDFFile(url: URL) {
+        let file = OpenFile(
+            url: url,
+            name: url.lastPathComponent,
+            content: "",
+            fileType: .pdf,
+            sourcePDFURL: url
+        )
+        openFiles.append(file)
+        activeFileID = file.id
+        recentItemsManager?.addRecentFile(url)
+
+        let fileID = file.id
+        Task {
+            do {
+                let result = try await pdfService.extractText(from: url)
+                guard let index = openFiles.firstIndex(where: { $0.id == fileID }) else { return }
+                openFiles[index].content = result.text
+                openFiles[index].pdfPageCount = result.pageCount
+                openFiles[index].pdfExtractionMethod = result.extractionMethod.rawValue
+
+                let detected = detectLanguage(for: result.text) ?? settingsState?.defaultSourceLanguage
+                openFiles[index].detectedLanguage = detected
+                openFiles[index].selectedSourceLanguage = detected
+
+                if let targetLang = settingsState?.defaultTargetLanguage,
+                   targetLang != detected {
+                    addTranslation(for: fileID, language: targetLang)
+                }
+            } catch {
+                errorMessage = "Failed to extract text from \(url.lastPathComponent): \(error.localizedDescription)"
+                showError = true
+            }
+        }
+
+        fileWatcherService.watch(url: url) { [weak self] changedURL in
+            Task { @MainActor in
+                self?.markFileAsExternallyModified(url: changedURL)
+            }
+        }
+    }
+
     func closeActiveFile() {
         guard let id = activeFileID else { return }
         closeFile(id: id)
@@ -259,9 +341,12 @@ class AppState {
         guard let index = openFiles.firstIndex(where: { $0.id == id }) else { return }
         let url = openFiles[index].url
 
-        if openFiles[index].fileType == .image {
+        switch openFiles[index].fileType {
+        case .pdf:
+            reloadPDFFile(id: id, url: url, index: index)
+        case .image:
             reloadImageFile(id: id, url: url, index: index)
-        } else {
+        case .text:
             reloadTextFile(id: id, url: url, index: index)
         }
     }
@@ -290,6 +375,28 @@ class AppState {
                 guard let idx = openFiles.firstIndex(where: { $0.id == id }) else { return }
                 openFiles[idx].content = result.text
                 openFiles[idx].ocrConfidence = result.confidence
+
+                let detected = detectLanguage(for: result.text)
+                openFiles[idx].detectedLanguage = detected
+
+                retranslateAllPanels(for: id)
+            } catch {
+                errorMessage = "Failed to extract text from \(url.lastPathComponent): \(error.localizedDescription)"
+                showError = true
+            }
+        }
+    }
+
+    private func reloadPDFFile(id: UUID, url: URL, index: Int) {
+        openFiles[index].isExternallyModified = false
+
+        Task {
+            do {
+                let result = try await pdfService.extractText(from: url)
+                guard let idx = openFiles.firstIndex(where: { $0.id == id }) else { return }
+                openFiles[idx].content = result.text
+                openFiles[idx].pdfPageCount = result.pageCount
+                openFiles[idx].pdfExtractionMethod = result.extractionMethod.rawValue
 
                 let detected = detectLanguage(for: result.text)
                 openFiles[idx].detectedLanguage = detected

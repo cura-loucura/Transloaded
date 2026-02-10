@@ -99,7 +99,7 @@ struct SidebarFileItemView: View {
             }
         } else {
             Label(item.name, systemImage: fileIcon)
-                .foregroundStyle(item.isTextFile || item.isImageFile ? .primary : .tertiary)
+                .foregroundStyle(item.isTextFile || item.isImageFile || item.isPDFFile ? .primary : .tertiary)
                 .tag(item.url)
                 .onTapGesture(count: 2) {
                     viewModel.handleDoubleClick(on: item)
@@ -124,6 +124,7 @@ struct SidebarFileItemView: View {
     }
 
     private var fileIcon: String {
+        if item.isPDFFile { return "doc.richtext" }
         if item.isImageFile { return "photo" }
         guard item.isTextFile else { return "doc.fill" }
 

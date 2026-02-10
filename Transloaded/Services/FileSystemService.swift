@@ -16,7 +16,8 @@ struct FileSystemService {
                 isDirectory: false,
                 children: nil,
                 isTextFile: isTextFile(at: url),
-                isImageFile: isImageFile(at: url)
+                isImageFile: isImageFile(at: url),
+                isPDFFile: isPDFFile(at: url)
             )
         }
 
@@ -41,7 +42,8 @@ struct FileSystemService {
             isDirectory: true,
             children: children,
             isTextFile: false,
-            isImageFile: false
+            isImageFile: false,
+            isPDFFile: false
         )
     }
 
@@ -71,6 +73,13 @@ struct FileSystemService {
         ]
 
         return textExtensions.contains(url.pathExtension.lowercased())
+    }
+
+    func isPDFFile(at url: URL) -> Bool {
+        if let type = try? url.resourceValues(forKeys: [.contentTypeKey]).contentType {
+            return type.conforms(to: .pdf)
+        }
+        return url.pathExtension.lowercased() == "pdf"
     }
 
     func isImageFile(at url: URL) -> Bool {

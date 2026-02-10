@@ -11,7 +11,10 @@ struct OCRResult: Sendable {
 actor OCRService {
     func recognizeText(in url: URL) async throws -> OCRResult {
         let cgImage = try loadCGImage(from: url)
+        return try recognizeText(from: cgImage)
+    }
 
+    func recognizeText(from cgImage: CGImage) throws -> OCRResult {
         let request = VNRecognizeTextRequest()
         request.recognitionLevel = .accurate
         request.usesLanguageCorrection = true
