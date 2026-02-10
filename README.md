@@ -1,7 +1,7 @@
 # Transloaded
 ![Icon](./assets/AppIcon.png)
 
-A native macOS file translation app powered by Apple's on-device Translation framework. Open files and directories, auto-detect languages, and translate content side-by-side — all offline, all private.
+A native macOS file translation app powered by Apple's on-device Translation framework. Open files and directories, auto-detect languages, and translate content side-by-side — all offline and private.
 
 ![macOS 15+](https://img.shields.io/badge/macOS-15%2B-blue) ![Swift 6](https://img.shields.io/badge/Swift-6-orange) ![On-Device](https://img.shields.io/badge/translation-on--device-green)
 
@@ -15,6 +15,7 @@ Transloaded lets you open text-based files and instantly translate them into any
 ## Features
 
 - **File & directory browser** — Open individual files or entire directory trees. Navigate with a sidebar inspired by Sublime Text and Obsidian.
+- **PDF and Image translation** - Open images and pdfs, with Mac OS native text recognition and translate the readable text to any of the supported languages. Use continuity camera for scanning documents and printed materials.
 - **Side-by-side translation panels** — Add one or more translation panels per file. Each panel translates the source into a different language.
 - **Auto language detection** — Source language is detected automatically using NaturalLanguage. Override it manually if needed.
 - **20 languages** — Arabic, Chinese (Simplified & Traditional), Dutch, English, French, German, Hindi, Indonesian, Italian, Japanese, Korean, Polish, Portuguese, Russian, Spanish, Thai, Turkish, Ukrainian, Vietnamese.
@@ -116,7 +117,5 @@ Open **Transloaded > Settings** (Cmd+,) to configure:
 ## Planned Features
 
 1. Right-To-Left as well as Vertical Text support
-2. PDF and Image Text extraction and translation
-3. Camera Scanner import
-4. HomeBrew installation support
+2. HomeBrew installation support
 
