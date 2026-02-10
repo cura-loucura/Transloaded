@@ -8,12 +8,14 @@ struct ContentView: View {
     @Bindable var translationViewModel: TranslationViewModel
     @Bindable var settingsState: SettingsState
 
+    private let cameraImportService = CameraImportService()
+    @State private var showCameraMenu = false
+
     private var selectedFileURL: Binding<URL?> {
         Binding<URL?>(
             get: { appState.activeFile?.url },
             set: { newURL in
                 guard let url = newURL else { return }
-                // Only switch to already-open files; don't open new ones
                 if let existing = appState.openFiles.first(where: { $0.url == url }) {
                     appState.setActiveFile(id: existing.id)
                 }
@@ -36,6 +38,14 @@ struct ContentView: View {
                 settingsState: settingsState
             )
         }
+        .background {
+            ContinuityCameraReceiver(
+                onImageReceived: { image in handleCameraImage(image) },
+                showMenu: $showCameraMenu
+            )
+            .frame(width: 1, height: 1)
+            .allowsHitTesting(false)
+        }
         .onAppear {
             sidebarViewModel.onFileDoubleClick = { url in
                 appState.openFile(url: url)
@@ -52,6 +62,12 @@ struct ContentView: View {
                     Label("Open Directory", systemImage: "folder.badge.plus")
                 }
                 .help("Open Directory")
+
+                Button(action: { showCameraMenu = true }) {
+                    Label("Import from Camera", systemImage: "camera.fill")
+                }
+                .help("Import from iPhone Camera")
+                .disabled(sidebarViewModel.importTargetFolder == nil)
             }
 
             ToolbarItemGroup(placement: .secondaryAction) {
@@ -151,6 +167,23 @@ struct ContentView: View {
             } catch {
                 translationViewModel.onTranslationDownloadFailed(error)
             }
+        }
+    }
+
+    private func handleCameraImage(_ image: NSImage) {
+        guard let folder = sidebarViewModel.importTargetFolder else {
+            appState.errorMessage = "Open a folder first to import camera images"
+            appState.showError = true
+            return
+        }
+
+        do {
+            let savedURL = try cameraImportService.saveImage(image, to: folder)
+            sidebarViewModel.refreshRoot(at: folder)
+            appState.openFile(url: savedURL)
+        } catch {
+            appState.errorMessage = "Camera import failed: \(error.localizedDescription)"
+            appState.showError = true
         }
     }
 

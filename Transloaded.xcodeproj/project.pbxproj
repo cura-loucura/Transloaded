@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -16,6 +16,7 @@
 		55B6646F1662599E9786A155 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EBACA0B52C0686ED87F97F04 /* Assets.xcassets */; };
 		64E8AA92E5D7AEBC992BB74E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1E371637D34F557E7B1C0 /* ContentView.swift */; };
 		68C3AB485ACAA8D3978B4BA2 /* OpenFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBFBE96226C02474969198D /* OpenFile.swift */; };
+		6ECBAC8614617B653A585A55 /* CameraImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1275C711E7692B43EE9F46C3 /* CameraImportService.swift */; };
 		73D283B8E8187FCBD479C873 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CE3DBAEE20961453D19CF1 /* SidebarView.swift */; };
 		7ED198C5C8FA17CD8D584B39 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6106F651E858A9AA3C2CAAD /* SettingsView.swift */; };
 		8089A1B31BE4B15AD2E704FA /* SidebarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C613CEC6E5B39BA37AD4117E /* SidebarViewModel.swift */; };
@@ -23,6 +24,7 @@
 		8D39DEA464E0D5296FBF5257 /* SupportedLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFC43AADA9575A0C7FB14D /* SupportedLanguage.swift */; };
 		8ECA300D87A27DED3D793951 /* TranslationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9A3AF9CAD9B858ACC78612 /* TranslationViewModel.swift */; };
 		932F6026C5313B1793255EF4 /* TransloadedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2627E87F7E3AF1223E2A2D1A /* TransloadedApp.swift */; };
+		B73FD22D26C8381A73731979 /* ContinuityCameraReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 789E14D6FA864EF072E02E20 /* ContinuityCameraReceiver.swift */; };
 		BA50A0E27ED6FF25E6E5D465 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1C14B169DB4103AA755EC0A8 /* Preview Assets.xcassets */; };
 		C599F976FF5FE88C130F64E5 /* RecentItemsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4F04861E45A9074EC67F19 /* RecentItemsManager.swift */; };
 		C5A48D49B110130CC354613F /* PDFService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C830EA29FD2BE4279C627D47 /* PDFService.swift */; };
@@ -38,6 +40,7 @@
 /* Begin PBXFileReference section */
 		03CE3DBAEE20961453D19CF1 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		0B41CB69547601DDF7FE99E8 /* FileWatcherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWatcherService.swift; sourceTree = "<group>"; };
+		1275C711E7692B43EE9F46C3 /* CameraImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraImportService.swift; sourceTree = "<group>"; };
 		1C14B169DB4103AA755EC0A8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		21FFCB8674106B0EA5CC9E11 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
 		24E70CA4F8A58ADD6007531C /* FileItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileItem.swift; sourceTree = "<group>"; };
@@ -47,6 +50,7 @@
 		6890E0EFDC7CDDF2555D2330 /* TranslationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationError.swift; sourceTree = "<group>"; };
 		6D369CDC9AC0AB2EE472BA58 /* FileTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTabBar.swift; sourceTree = "<group>"; };
 		6DAFC43AADA9575A0C7FB14D /* SupportedLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedLanguage.swift; sourceTree = "<group>"; };
+		789E14D6FA864EF072E02E20 /* ContinuityCameraReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinuityCameraReceiver.swift; sourceTree = "<group>"; };
 		8C9A3AF9CAD9B858ACC78612 /* TranslationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationViewModel.swift; sourceTree = "<group>"; };
 		92D3E3261C0C15990BAE45D4 /* TranslationPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationPanelView.swift; sourceTree = "<group>"; };
 		9A460677C5B821C4750DABD3 /* EditorAreaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorAreaView.swift; sourceTree = "<group>"; };
@@ -151,6 +155,7 @@
 		D2AE2DD310D99D06D25A5F66 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				1275C711E7692B43EE9F46C3 /* CameraImportService.swift */,
 				9BF7ABB473FE6CB69E328EA6 /* FileSystemService.swift */,
 				0B41CB69547601DDF7FE99E8 /* FileWatcherService.swift */,
 				21FFCB8674106B0EA5CC9E11 /* OCRService.swift */,
@@ -165,6 +170,7 @@
 			isa = PBXGroup;
 			children = (
 				9EA1E371637D34F557E7B1C0 /* ContentView.swift */,
+				789E14D6FA864EF072E02E20 /* ContinuityCameraReceiver.swift */,
 				1211DCF8426345E164005323 /* Editor */,
 				BC0FE5EF58EA9F9BCBC9F4EA /* Settings */,
 				F60DD4B5CBB333881EF47FA9 /* Sidebar */,
@@ -235,7 +241,6 @@
 			);
 			mainGroup = FA2BFED9BFE0C616EEC29443;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -262,7 +267,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				F43E764E3E73155E0ED4CC39 /* AppState.swift in Sources */,
+				6ECBAC8614617B653A585A55 /* CameraImportService.swift in Sources */,
 				64E8AA92E5D7AEBC992BB74E /* ContentView.swift in Sources */,
+				B73FD22D26C8381A73731979 /* ContinuityCameraReceiver.swift in Sources */,
 				4CF81B4E71973F670C732AAB /* EditorAreaView.swift in Sources */,
 				4F52464C6E995F11AB276024 /* FileContentView.swift in Sources */,
 				F6D797A0FA010BD44AC5DFD8 /* FileItem.swift in Sources */,
@@ -358,12 +365,20 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = Transloaded/Transloaded.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7387Q28AG9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Transloaded;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -376,6 +391,12 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.transloaded.app;
 				PRODUCT_NAME = Transloaded;
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
 				SDKROOT = macosx;
 				SWIFT_VERSION = 6.0;
 			};
@@ -385,12 +406,20 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = Transloaded/Transloaded.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7387Q28AG9;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Transloaded;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -403,6 +432,12 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.transloaded.app;
 				PRODUCT_NAME = Transloaded;
+				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
+				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
+				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
+				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
+				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
+				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
 				SDKROOT = macosx;
 				SWIFT_VERSION = 6.0;
 			};

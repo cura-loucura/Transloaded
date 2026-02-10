@@ -52,6 +52,16 @@ class SidebarViewModel {
         onFileDoubleClick?(item.url)
     }
 
+    var importTargetFolder: URL? {
+        roots.first(where: { $0.isDirectory })?.url
+    }
+
+    func refreshRoot(at url: URL) {
+        guard let index = roots.firstIndex(where: { $0.url == url }) else { return }
+        let refreshed = fileSystemService.loadDirectory(at: url)
+        roots[index] = refreshed
+    }
+
     func addURLs(_ urls: [URL]) {
         for url in urls {
             guard !roots.contains(where: { $0.url == url }) else { continue }

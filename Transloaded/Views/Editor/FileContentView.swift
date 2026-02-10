@@ -336,8 +336,9 @@ struct FileContentView: View {
                 .font(.title3)
                 .foregroundStyle(.secondary)
             VStack(spacing: 4) {
-                Text("Double-click a file in the sidebar to open it")
-                Text("or drag files and folders into the window")
+                Text("Double-click a file in the sidebar to open it,")
+                Text("drag files into the window,")
+                Text("or use Edit \u{2192} Import from iPhone to capture with your camera")
             }
             .font(.subheadline)
             .foregroundStyle(.tertiary)
