@@ -6,12 +6,12 @@ Wishlist:
 
 - Add option for RTL and Vertical text for each language panel (Original and translations)
 
-- ~~PDF and image translation support by extracting text onto an  "original" panel and a preview of the document~~ DONE
-
-- ~~Continuity camera and image imports~~ DONE
-
 - HomeBrew support
 
 - Translation of Labels and general accessibility conforms
 
 - App Store release
+
+- transloaded.app website
+
+- Download of language pairs directly on the settings panel
