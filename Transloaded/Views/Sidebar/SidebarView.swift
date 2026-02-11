@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct SidebarView: View {
     @Bindable var viewModel: SidebarViewModel
@@ -146,27 +147,56 @@ struct SidebarFileItemView: View {
                     }
                 }
             } label: {
-                Label(item.name, systemImage: "folder.fill")
-                    .foregroundStyle(isRoot ? .primary : .secondary)
-                    .padding(.vertical, 1)
-                    .padding(.horizontal, 2)
-                    .background(
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(
-                                viewModel.selectedFolderURL == item.url
-                                    ? Color.accentColor.opacity(0.15)
-                                    : (isHovered ? Color.primary.opacity(0.06) : Color.clear)
-                            )
-                    )
-                    .onHover { hovering in
-                        isHovered = hovering
+                HStack(spacing: 0) {
+                    Label(item.name, systemImage: "folder.fill")
+                        .foregroundStyle(isRoot ? .primary : .secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            viewModel.selectedFolderURL = item.url
+                        }
+
+                    if isHovered || viewModel.selectedFolderURL == item.url {
+                        Menu {
+                            Button("Show in Finder") {
+                                NSWorkspace.shared.activateFileViewerSelecting([item.url])
+                            }
+                            if isRoot {
+                                Divider()
+                                Button("Remove from Sidebar") {
+                                    viewModel.removeRoot(item)
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.secondary)
+                                .padding(2)
+                        }
+                        .menuStyle(.borderlessButton)
+                        .fixedSize()
                     }
-                    .onTapGesture {
-                        viewModel.selectedFolderURL = item.url
-                    }
+                }
+                .padding(.vertical, 1)
+                .padding(.horizontal, 2)
+                .background(
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(
+                            viewModel.selectedFolderURL == item.url
+                                ? Color.accentColor.opacity(0.15)
+                                : (isHovered ? Color.primary.opacity(0.06) : Color.clear)
+                        )
+                )
+                .onHover { hovering in
+                    isHovered = hovering
+                }
             }
             .contextMenu {
+                Button("Show in Finder") {
+                    NSWorkspace.shared.activateFileViewerSelecting([item.url])
+                }
                 if isRoot {
+                    Divider()
                     Button("Remove from Sidebar") {
                         viewModel.removeRoot(item)
                     }

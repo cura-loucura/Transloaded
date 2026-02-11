@@ -116,7 +116,7 @@ class SidebarViewModel {
             }.value
             self.defaultFolderItem = item
         }
-        defaultFolderWatcher.watch(url: url) { [weak self] _ in
+        defaultFolderWatcher.watchDirectory(url) { [weak self] in
             DispatchQueue.main.async { self?.scheduleDefaultFolderRefresh() }
         }
     }
