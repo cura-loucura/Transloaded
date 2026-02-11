@@ -20,6 +20,12 @@ class SettingsState {
 
     let allLanguages: [SupportedLanguage] = SupportedLanguage.allCases
 
+    /// The SupportedLanguage matching the OS language, falling back to English.
+    let osLanguage: SupportedLanguage = {
+        let code = Locale.current.language.languageCode?.identifier ?? ""
+        return SupportedLanguage.allCases.first { $0.languageCode == code } ?? .english
+    }()
+
     var activeLanguages: [SupportedLanguage] {
         didSet { saveActiveLanguages() }
     }
@@ -86,7 +92,11 @@ class SettingsState {
     init() {
         // Load active languages
         if let rawValues = UserDefaults.standard.stringArray(forKey: Self.activeLanguagesKey) {
-            let loaded = rawValues.compactMap { SupportedLanguage(rawValue: $0) }
+            var loaded = rawValues.compactMap { SupportedLanguage(rawValue: $0) }
+            // Ensure OS language is always active
+            if !loaded.contains(osLanguage) {
+                loaded.insert(osLanguage, at: 0)
+            }
             self.activeLanguages = loaded.isEmpty ? SupportedLanguage.defaultActive : loaded
         } else {
             self.activeLanguages = SupportedLanguage.defaultActive
@@ -135,8 +145,10 @@ class SettingsState {
     }
 
     func toggleLanguage(_ language: SupportedLanguage) {
+        // OS language cannot be deactivated
+        guard language != osLanguage else { return }
+
         if activeLanguages.contains(language) {
-            // Don't allow deactivating the last language
             guard activeLanguages.count > 1 else { return }
             activeLanguages.removeAll { $0 == language }
         } else {

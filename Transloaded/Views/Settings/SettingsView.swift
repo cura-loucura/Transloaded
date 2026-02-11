@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Bindable var settingsState: SettingsState
+    @Bindable var translationViewModel: TranslationViewModel
 
     var body: some View {
         TabView {
@@ -15,13 +16,23 @@ struct SettingsView: View {
                     Label("General", systemImage: "gear")
                 }
         }
-        .frame(width: 450, height: 350)
+        .frame(width: 450, height: 450)
+    }
+
+    // MARK: - Reference Language
+
+    private var referenceLanguage: SupportedLanguage {
+        settingsState.defaultSourceLanguage ?? settingsState.osLanguage
     }
 
     // MARK: - Languages Tab
 
     private var languagesTab: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
+            downloadSection
+
+            Divider()
+
             Text("Active Languages")
                 .font(.headline)
 
@@ -31,6 +42,7 @@ struct SettingsView: View {
 
             List {
                 ForEach(settingsState.allLanguages) { lang in
+                    let isOSLanguage = lang == settingsState.osLanguage
                     HStack {
                         Toggle(isOn: Binding(
                             get: { settingsState.isLanguageActive(lang) },
@@ -39,8 +51,15 @@ struct SettingsView: View {
                             Text(lang.displayName)
                         }
                         .toggleStyle(.switch)
+                        .disabled(isOSLanguage)
 
                         Spacer()
+
+                        if isOSLanguage {
+                            Text("System")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
 
                         Text(lang.languageCode)
                             .font(.caption)
@@ -52,6 +71,47 @@ struct SettingsView: View {
             .listStyle(.bordered)
         }
         .padding()
+    }
+
+    @ViewBuilder
+    private var downloadSection: some View {
+        let langs = settingsState.activeLanguages
+        let ref = referenceLanguage
+        let othersCount = langs.count - 1
+
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Download Language Packs")
+                .font(.headline)
+
+            Text("Pre-download translation packs for offline use. A system dialog will appear for each language pair.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            HStack(spacing: 8) {
+                Button("\(ref.displayName) → \(othersCount) language\(othersCount == 1 ? "" : "s")") {
+                    let others = langs.filter { $0 != ref }
+                    let pairs = others.map { (source: ref, target: $0) }
+                    Task {
+                        await translationViewModel.startBulkDownload(pairs: pairs)
+                    }
+                }
+                .disabled(langs.count < 2)
+
+                Button("All \(langs.count) language combinations") {
+                    var pairs: [(source: SupportedLanguage, target: SupportedLanguage)] = []
+                    for source in langs {
+                        for target in langs where source != target {
+                            pairs.append((source: source, target: target))
+                        }
+                    }
+                    Task {
+                        await translationViewModel.startBulkDownload(pairs: pairs)
+                    }
+                }
+                .disabled(langs.count < 2)
+            }
+            .font(.callout)
+        }
     }
 
     // MARK: - General Tab

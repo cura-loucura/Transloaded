@@ -5,6 +5,8 @@ struct SidebarView: View {
     @Binding var selectedFileURL: URL?
     var onOpenScrapbook: (() -> Void)?
 
+    @Environment(\.openSettings) private var openSettings
+
     var body: some View {
         VStack(spacing: 0) {
             scrapbookButton
@@ -18,6 +20,9 @@ struct SidebarView: View {
                 }
             }
             .frame(maxHeight: .infinity)
+
+            Divider()
+            settingsButton
         }
         .frame(minWidth: 200)
     }
@@ -33,6 +38,22 @@ struct SidebarView: View {
         }
         .buttonStyle(.plain)
         .background(Color.primary.opacity(0.04))
+    }
+
+    private var settingsButton: some View {
+        HStack {
+            Spacer()
+            Button {
+                openSettings()
+            } label: {
+                Image(systemName: "gearshape")
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Settings")
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
     }
 
     private var emptyState: some View {

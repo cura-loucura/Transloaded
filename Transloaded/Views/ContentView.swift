@@ -160,13 +160,20 @@ struct ContentView: View {
         } message: {
             Text("The scrapbook has content. Close without saving?")
         }
-        .translationTask(translationViewModel.translationConfig) { session in
-            do {
-                try await session.prepareTranslation()
-                translationViewModel.onTranslationDownloadComplete()
-            } catch {
-                translationViewModel.onTranslationDownloadFailed(error)
-            }
+        .background {
+            // Isolated view so .id() only recreates this, not the whole ContentView.
+            // Changing translationTaskID forces SwiftUI to re-mount the modifier,
+            // which is needed because .translationTask won't re-trigger after dismissal.
+            Color.clear
+                .translationTask(translationViewModel.translationConfig) { session in
+                    do {
+                        try await session.prepareTranslation()
+                        await translationViewModel.verifyAndCompleteDownload()
+                    } catch {
+                        translationViewModel.onTranslationDownloadFailed(error)
+                    }
+                }
+                .id(translationViewModel.translationTaskID)
         }
     }
 

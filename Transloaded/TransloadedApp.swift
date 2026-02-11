@@ -161,7 +161,10 @@ struct TransloadedApp: App {
         }
 
         Settings {
-            SettingsView(settingsState: settingsState)
+            SettingsView(
+                settingsState: settingsState,
+                translationViewModel: translationViewModel
+            )
         }
     }
 
