@@ -158,6 +158,29 @@ struct TransloadedApp: App {
                 .keyboardShortcut("r", modifiers: .command)
                 .disabled(appState.activeFileID == nil)
             }
+
+            CommandGroup(after: .toolbar) {
+                Divider()
+
+                Button("Increase Font Size") {
+                    if settingsState.editorFontSize < 36 {
+                        settingsState.editorFontSize += 1
+                    }
+                }
+                .keyboardShortcut("+", modifiers: .command)
+
+                Button("Decrease Font Size") {
+                    if settingsState.editorFontSize > 9 {
+                        settingsState.editorFontSize -= 1
+                    }
+                }
+                .keyboardShortcut("-", modifiers: .command)
+
+                Button("Reset Font Size") {
+                    settingsState.editorFontSize = 13
+                }
+                .keyboardShortcut("0", modifiers: .command)
+            }
         }
 
         Settings {
