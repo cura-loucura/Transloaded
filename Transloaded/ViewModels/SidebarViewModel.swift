@@ -10,6 +10,17 @@ class SidebarViewModel {
 
     var onFileDoubleClick: ((URL) -> Void)?
     var recentItemsManager: RecentItemsManager?
+    var settingsState: SettingsState?
+
+    var selectedFolderURL: URL?
+    var defaultFolderItem: FileItem?
+
+    // Import-to-folder dialog state
+    var pendingImportURLs: [URL] = []
+    var pendingImportFolderURL: URL?
+    var showImportToFolderAlert = false
+
+    private var defaultFolderWatcher = FileWatcherService()
 
     func addDirectory() {
         let panel = NSOpenPanel()
@@ -36,10 +47,35 @@ class SidebarViewModel {
 
         guard panel.runModal() == .OK else { return }
 
-        for url in panel.urls {
-            guard !roots.contains(where: { $0.url == url }) else { continue }
-            let item = fileSystemService.loadDirectory(at: url)
-            roots.append(item)
+        let urls = panel.urls.filter { url in !roots.contains(where: { $0.url == url }) }
+
+        if let targetFolder = selectedFolderURL {
+            pendingImportURLs = urls
+            pendingImportFolderURL = targetFolder
+            showImportToFolderAlert = true
+        } else {
+            for url in urls { addURLToRoots(url) }
+        }
+    }
+
+    func confirmImport(toFolder: Bool) {
+        defer {
+            pendingImportURLs = []
+            pendingImportFolderURL = nil
+            showImportToFolderAlert = false
+        }
+        guard toFolder, let targetFolder = pendingImportFolderURL else {
+            for url in pendingImportURLs { addURLToRoots(url) }
+            return
+        }
+        for url in pendingImportURLs {
+            let dest = targetFolder.appendingPathComponent(url.lastPathComponent)
+            try? FileManager.default.copyItem(at: url, to: dest)
+        }
+        if let rootURL = roots.first(where: { targetFolder.path.hasPrefix($0.url.path) })?.url {
+            refreshRoot(at: rootURL)
+        } else {
+            refreshDefaultFolder()
         }
     }
 
@@ -52,10 +88,6 @@ class SidebarViewModel {
         onFileDoubleClick?(item.url)
     }
 
-    var importTargetFolder: URL? {
-        roots.first(where: { $0.isDirectory })?.url
-    }
-
     func refreshRoot(at url: URL) {
         guard let index = roots.firstIndex(where: { $0.url == url }) else { return }
         let refreshed = fileSystemService.loadDirectory(at: url)
@@ -63,17 +95,63 @@ class SidebarViewModel {
     }
 
     func addURLs(_ urls: [URL]) {
-        for url in urls {
-            guard !roots.contains(where: { $0.url == url }) else { continue }
-            let item = fileSystemService.loadDirectory(at: url)
-            roots.append(item)
+        for url in urls { addURLToRoots(url) }
+    }
 
-            let isDir = (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
-            if isDir {
-                recentItemsManager?.addRecentFolder(url)
-            } else {
-                recentItemsManager?.addRecentFile(url)
-            }
+    // MARK: - Default Folder
+
+    func loadDefaultFolder() {
+        guard let path = settingsState?.defaultFolderPath else { return }
+        let url = URL(fileURLWithPath: path).standardized
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        defaultFolderItem = fileSystemService.loadDirectory(at: url)
+        defaultFolderWatcher.watch(url: url) { [weak self] _ in
+            DispatchQueue.main.async { self?.refreshDefaultFolder() }
+        }
+    }
+
+    func refreshDefaultFolder() {
+        guard let path = settingsState?.defaultFolderPath else { return }
+        let url = URL(fileURLWithPath: path).standardized
+        defaultFolderItem = fileSystemService.loadDirectory(at: url)
+    }
+
+    // MARK: - New Folder
+
+    func nextNewFolderName(in parentURL: URL) -> String {
+        let existing = (try? FileManager.default.contentsOfDirectory(atPath: parentURL.path)) ?? []
+        if !existing.contains("New Folder") { return "New Folder" }
+        var i = 2
+        while existing.contains("New Folder \(i)") { i += 1 }
+        return "New Folder \(i)"
+    }
+
+    func folderNameExists(_ name: String, in parentURL: URL) -> Bool {
+        let candidate = parentURL.appendingPathComponent(name)
+        return FileManager.default.fileExists(atPath: candidate.path)
+    }
+
+    func createSubfolder(named name: String, in parentURL: URL) throws {
+        let newURL = parentURL.appendingPathComponent(name)
+        try FileManager.default.createDirectory(at: newURL, withIntermediateDirectories: false)
+        if let rootURL = roots.first(where: { parentURL.path.hasPrefix($0.url.path) })?.url {
+            refreshRoot(at: rootURL)
+        } else {
+            refreshDefaultFolder()
+        }
+    }
+
+    // MARK: - Private Helpers
+
+    private func addURLToRoots(_ url: URL) {
+        guard !roots.contains(where: { $0.url == url }) else { return }
+        let item = fileSystemService.loadDirectory(at: url)
+        roots.append(item)
+        let isDir = (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
+        if isDir {
+            recentItemsManager?.addRecentFolder(url)
+        } else {
+            recentItemsManager?.addRecentFile(url)
         }
     }
 }

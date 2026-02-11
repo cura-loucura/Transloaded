@@ -13,6 +13,7 @@ class SettingsState {
     private static let editorFontNameKey = "editorFontName"
     private static let editorFontSizeKey = "editorFontSize"
     private static let rememberOpenItemsKey = "rememberOpenItems"
+    private static let defaultFolderPathKey = "defaultFolderPath"
 
     private static let sessionSidebarBookmarksKey = "sessionSidebarBookmarks"
     private static let sessionOpenFileBookmarksKey = "sessionOpenFileBookmarks"
@@ -81,6 +82,10 @@ class SettingsState {
         }
     }
 
+    var defaultFolderPath: String {
+        didSet { UserDefaults.standard.set(defaultFolderPath, forKey: Self.defaultFolderPathKey) }
+    }
+
     var editorFont: Font {
         if editorFontName.isEmpty {
             return .system(size: CGFloat(editorFontSize), design: .monospaced)
@@ -142,6 +147,11 @@ class SettingsState {
         } else {
             self.rememberOpenItems = true
         }
+
+        // Load default folder path
+        self.defaultFolderPath = UserDefaults.standard.string(forKey: Self.defaultFolderPathKey)
+            ?? FileManager.default.homeDirectoryForCurrentUser
+                .appendingPathComponent("Documents/Transloaded").path
     }
 
     func toggleLanguage(_ language: SupportedLanguage) {

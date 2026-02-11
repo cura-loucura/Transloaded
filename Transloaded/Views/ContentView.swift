@@ -67,7 +67,7 @@ struct ContentView: View {
                     Label("Import from Camera", systemImage: "camera.fill")
                 }
                 .help("Import from iPhone Camera")
-                .disabled(sidebarViewModel.importTargetFolder == nil)
+                .disabled(sidebarViewModel.defaultFolderItem == nil)
             }
 
             ToolbarItemGroup(placement: .secondaryAction) {
@@ -150,6 +150,19 @@ struct ContentView: View {
                 Text("\(url.lastPathComponent) is larger than 1 MB. Opening large files may affect performance.")
             }
         }
+        .alert(
+            "Import to '\(sidebarViewModel.pendingImportFolderURL?.lastPathComponent ?? "folder")'?",
+            isPresented: $sidebarViewModel.showImportToFolderAlert
+        ) {
+            Button("Yes") { sidebarViewModel.confirmImport(toFolder: true) }
+            Button("No") { sidebarViewModel.confirmImport(toFolder: false) }
+            Button("Cancel", role: .cancel) {
+                sidebarViewModel.pendingImportURLs = []
+                sidebarViewModel.showImportToFolderAlert = false
+            }
+        } message: {
+            Text("Copy the selected file(s) into this folder?")
+        }
         .alert("Close Scrapbook", isPresented: $appState.showCloseScrapbookAlert) {
             Button("Don't Save", role: .destructive) {
                 appState.confirmCloseScrapbook()
@@ -178,15 +191,24 @@ struct ContentView: View {
     }
 
     private func handleCameraImage(_ image: NSImage) {
-        guard let folder = sidebarViewModel.importTargetFolder else {
-            appState.errorMessage = "Open a folder first to import camera images"
+        let targetFolder: URL
+        if let selected = sidebarViewModel.selectedFolderURL {
+            targetFolder = selected
+        } else if let defaultItem = sidebarViewModel.defaultFolderItem {
+            targetFolder = defaultItem.url
+        } else {
+            appState.errorMessage = "No import folder available"
             appState.showError = true
             return
         }
 
         do {
-            let savedURL = try cameraImportService.saveImage(image, to: folder)
-            sidebarViewModel.refreshRoot(at: folder)
+            let savedURL = try cameraImportService.saveImage(image, to: targetFolder)
+            if let rootURL = sidebarViewModel.roots.first(where: { targetFolder.path.hasPrefix($0.url.path) })?.url {
+                sidebarViewModel.refreshRoot(at: rootURL)
+            } else {
+                sidebarViewModel.refreshDefaultFolder()
+            }
             appState.openFile(url: savedURL)
         } catch {
             appState.errorMessage = "Camera import failed: \(error.localizedDescription)"

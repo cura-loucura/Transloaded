@@ -80,6 +80,8 @@ struct TransloadedApp: App {
                 appState.settingsState = settingsState
                 appState.recentItemsManager = recentItemsManager
                 sidebarViewModel.recentItemsManager = recentItemsManager
+                sidebarViewModel.settingsState = settingsState
+                sidebarViewModel.loadDefaultFolder()
                 translationViewModel.onAllDownloadsComplete = { [weak appState] in
                     appState?.retryPendingDownloads()
                 }

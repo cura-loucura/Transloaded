@@ -118,6 +118,30 @@ struct SettingsView: View {
 
     private var generalTab: some View {
         Form {
+            Section("Default Import Folder") {
+                HStack {
+                    Text(settingsState.defaultFolderPath)
+                        .font(.caption.monospaced())
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                    Spacer()
+                    Button("Choose…") {
+                        let panel = NSOpenPanel()
+                        panel.canChooseFiles = false
+                        panel.canChooseDirectories = true
+                        panel.allowsMultipleSelection = false
+                        panel.message = "Choose the default import folder"
+                        if panel.runModal() == .OK, let url = panel.url {
+                            settingsState.defaultFolderPath = url.path
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                }
+                Text("New scans and imports go here when no folder is selected.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Session") {
                 Toggle("Remember open files and directories", isOn: $settingsState.rememberOpenItems)
                 Text("Restore previously open sidebar items and editor tabs when the app launches.")

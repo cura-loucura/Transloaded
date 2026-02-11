@@ -6,25 +6,26 @@ struct SidebarView: View {
     var onOpenScrapbook: (() -> Void)?
 
     @Environment(\.openSettings) private var openSettings
+    @State private var showNewFolderSheet = false
+    @State private var newFolderName = ""
+
+    private var targetFolderForNew: URL? {
+        viewModel.selectedFolderURL ?? viewModel.defaultFolderItem?.url
+    }
 
     var body: some View {
         VStack(spacing: 0) {
             scrapbookButton
             Divider()
-
-            Group {
-                if viewModel.roots.isEmpty {
-                    emptyState
-                } else {
-                    fileTree
-                }
-            }
-            .frame(maxHeight: .infinity)
-
+            newFolderToolbar
+            fileTree
             Divider()
             settingsButton
         }
         .frame(minWidth: 200)
+        .sheet(isPresented: $showNewFolderSheet) {
+            newFolderSheet
+        }
     }
 
     private var scrapbookButton: some View {
@@ -56,30 +57,76 @@ struct SidebarView: View {
         .padding(.vertical, 10)
     }
 
-    private var emptyState: some View {
-        VStack(spacing: 12) {
+    private var newFolderToolbar: some View {
+        HStack {
             Spacer()
-            Image(systemName: "folder.badge.plus")
-                .font(.system(size: 32))
-                .foregroundStyle(.tertiary)
-            Text("No files or folders open")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            Text("Use File > Open to get started")
-                .font(.caption)
-                .foregroundStyle(.tertiary)
-            Spacer()
+            Button {
+                showNewFolderSheet = true
+            } label: {
+                Label("New Folder", systemImage: "folder.badge.plus")
+                    .labelStyle(.iconOnly)
+            }
+            .buttonStyle(.plain)
+            .disabled(targetFolderForNew == nil)
+            .help("New Folder in selected folder")
         }
-        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
     }
 
     private var fileTree: some View {
         List(selection: $selectedFileURL) {
+            // Default folder — pinned at top
+            if let defaultItem = viewModel.defaultFolderItem {
+                SidebarFileItemView(item: defaultItem, isRoot: true, viewModel: viewModel)
+            } else {
+                Label("Loading default folder…", systemImage: "folder")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            // User-added roots
             ForEach(viewModel.roots) { root in
                 SidebarFileItemView(item: root, isRoot: true, viewModel: viewModel)
             }
         }
         .listStyle(.sidebar)
+    }
+
+    @ViewBuilder
+    private var newFolderSheet: some View {
+        if let targetURL = targetFolderForNew {
+            VStack(spacing: 16) {
+                Text("New Folder in '\(targetURL.lastPathComponent)'")
+                    .font(.headline)
+
+                TextField("Folder name", text: $newFolderName)
+                    .textFieldStyle(.roundedBorder)
+                    .onAppear {
+                        newFolderName = viewModel.nextNewFolderName(in: targetURL)
+                    }
+
+                if !newFolderName.isEmpty && viewModel.folderNameExists(newFolderName, in: targetURL) {
+                    Text("A folder with this name already exists.")
+                        .foregroundStyle(.red)
+                        .font(.caption)
+                }
+
+                HStack {
+                    Button("Cancel") { showNewFolderSheet = false }
+                        .buttonStyle(.bordered)
+
+                    Button("Create") {
+                        try? viewModel.createSubfolder(named: newFolderName, in: targetURL)
+                        showNewFolderSheet = false
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(newFolderName.isEmpty || viewModel.folderNameExists(newFolderName, in: targetURL))
+                }
+            }
+            .padding(24)
+            .frame(width: 320)
+        }
     }
 }
 
@@ -105,10 +152,17 @@ struct SidebarFileItemView: View {
                     .padding(.horizontal, 2)
                     .background(
                         RoundedRectangle(cornerRadius: 4)
-                            .fill(isHovered ? Color.primary.opacity(0.06) : Color.clear)
+                            .fill(
+                                viewModel.selectedFolderURL == item.url
+                                    ? Color.accentColor.opacity(0.15)
+                                    : (isHovered ? Color.primary.opacity(0.06) : Color.clear)
+                            )
                     )
                     .onHover { hovering in
                         isHovered = hovering
+                    }
+                    .onTapGesture {
+                        viewModel.selectedFolderURL = item.url
                     }
             }
             .contextMenu {
