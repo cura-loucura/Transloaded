@@ -30,6 +30,20 @@ struct CameraImportService {
         return try saveAsJPEG(image, folder: folder, filename: filename)
     }
 
+    func savePDF(_ data: Data, to folder: URL) throws -> URL {
+        let nextNumber = nextScanNumber(in: folder)
+        let filename = String(format: "scan_%03d.pdf", nextNumber)
+        let url = folder.appendingPathComponent(filename)
+
+        do {
+            try data.write(to: url)
+        } catch {
+            throw CameraImportError.saveFailed(filename)
+        }
+
+        return url
+    }
+
     // MARK: - Private
 
     private func nextScanNumber(in folder: URL) -> Int {

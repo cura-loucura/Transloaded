@@ -41,6 +41,7 @@ struct ContentView: View {
         .background {
             ContinuityCameraReceiver(
                 onImageReceived: { image in handleCameraImage(image) },
+                onPDFReceived: { data in handleCameraPDF(data) },
                 showMenu: $showCameraMenu
             )
             .frame(width: 1, height: 1)
@@ -190,13 +191,20 @@ struct ContentView: View {
         }
     }
 
-    private func handleCameraImage(_ image: NSImage) {
-        let targetFolder: URL
-        if let selected = sidebarViewModel.selectedFolderURL {
-            targetFolder = selected
-        } else if let defaultItem = sidebarViewModel.defaultFolderItem {
-            targetFolder = defaultItem.url
+    private var cameraTargetFolder: URL? {
+        sidebarViewModel.selectedFolderURL ?? sidebarViewModel.defaultFolderItem?.url
+    }
+
+    private func refreshAfterCameraImport(targetFolder: URL) {
+        if let rootURL = sidebarViewModel.roots.first(where: { targetFolder.path.hasPrefix($0.url.path) })?.url {
+            sidebarViewModel.refreshRoot(at: rootURL)
         } else {
+            sidebarViewModel.refreshDefaultFolder()
+        }
+    }
+
+    private func handleCameraImage(_ image: NSImage) {
+        guard let targetFolder = cameraTargetFolder else {
             appState.errorMessage = "No import folder available"
             appState.showError = true
             return
@@ -204,11 +212,24 @@ struct ContentView: View {
 
         do {
             let savedURL = try cameraImportService.saveImage(image, to: targetFolder)
-            if let rootURL = sidebarViewModel.roots.first(where: { targetFolder.path.hasPrefix($0.url.path) })?.url {
-                sidebarViewModel.refreshRoot(at: rootURL)
-            } else {
-                sidebarViewModel.refreshDefaultFolder()
-            }
+            refreshAfterCameraImport(targetFolder: targetFolder)
+            appState.openFile(url: savedURL)
+        } catch {
+            appState.errorMessage = "Camera import failed: \(error.localizedDescription)"
+            appState.showError = true
+        }
+    }
+
+    private func handleCameraPDF(_ data: Data) {
+        guard let targetFolder = cameraTargetFolder else {
+            appState.errorMessage = "No import folder available"
+            appState.showError = true
+            return
+        }
+
+        do {
+            let savedURL = try cameraImportService.savePDF(data, to: targetFolder)
+            refreshAfterCameraImport(targetFolder: targetFolder)
             appState.openFile(url: savedURL)
         } catch {
             appState.errorMessage = "Camera import failed: \(error.localizedDescription)"

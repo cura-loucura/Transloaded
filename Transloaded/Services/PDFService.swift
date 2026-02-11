@@ -42,62 +42,42 @@ actor PDFService {
             return PDFExtractionResult(text: "", pageCount: 0, extractionMethod: .empty)
         }
 
-        // Try native text extraction first
-        let nativeText = extractNativeText(from: document)
+        // Extract per-page: use native text when available, OCR otherwise
+        var pages: [String] = []
+        var usedOCR = false
 
-        if nativeText.count >= nativeTextThreshold {
-            return PDFExtractionResult(
-                text: nativeText,
-                pageCount: pageCount,
-                extractionMethod: .native
-            )
+        for i in 0..<pageCount {
+            guard let page = document.page(at: i) else { continue }
+
+            let nativeText = page.string?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+            if nativeText.count >= nativeTextThreshold {
+                pages.append(nativeText)
+            } else if let cgImage = renderPageToImage(page) {
+                // Native text too short — OCR this page
+                let result = try await ocrService.recognizeText(from: cgImage)
+                if !result.text.isEmpty {
+                    pages.append(result.text)
+                    usedOCR = true
+                } else if !nativeText.isEmpty {
+                    pages.append(nativeText)
+                }
+            } else if !nativeText.isEmpty {
+                pages.append(nativeText)
+            }
         }
 
-        // Native extraction yielded little/no text — fall back to OCR
-        let ocrText = try await extractTextViaOCR(from: document)
+        let text = pages.joined(separator: "\n\n")
 
-        if ocrText.isEmpty {
+        if text.isEmpty {
             return PDFExtractionResult(text: "", pageCount: pageCount, extractionMethod: .empty)
         }
 
         return PDFExtractionResult(
-            text: ocrText,
+            text: text,
             pageCount: pageCount,
-            extractionMethod: .ocr
+            extractionMethod: usedOCR ? .ocr : .native
         )
-    }
-
-    // MARK: - Native Extraction
-
-    private func extractNativeText(from document: PDFDocument) -> String {
-        var pages: [String] = []
-
-        for i in 0..<document.pageCount {
-            guard let page = document.page(at: i) else { continue }
-            if let text = page.string, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                pages.append(text)
-            }
-        }
-
-        return pages.joined(separator: "\n\n")
-    }
-
-    // MARK: - OCR Fallback
-
-    private func extractTextViaOCR(from document: PDFDocument) async throws -> String {
-        var pages: [String] = []
-
-        for i in 0..<document.pageCount {
-            guard let page = document.page(at: i) else { continue }
-            guard let cgImage = renderPageToImage(page) else { continue }
-
-            let result = try await ocrService.recognizeText(from: cgImage)
-            if !result.text.isEmpty {
-                pages.append(result.text)
-            }
-        }
-
-        return pages.joined(separator: "\n\n")
     }
 
     private func renderPageToImage(_ page: PDFPage, dpi: CGFloat = 300) -> CGImage? {

@@ -48,8 +48,10 @@ class AppState {
             return
         }
 
-        // Check file size before opening
-        if let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
+        // Check file size before opening (only for text files — PDFs and images
+        // are extracted asynchronously and don't load raw content into the editor)
+        if !fileSystemService.isPDFFile(at: url) && !fileSystemService.isImageFile(at: url),
+           let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
            let size = attrs[.size] as? Int,
            size > Self.largeFileThreshold {
             pendingLargeFileURL = url
