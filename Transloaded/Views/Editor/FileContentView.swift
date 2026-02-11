@@ -55,7 +55,7 @@ struct FileContentView: View {
                 reloadBanner(for: file)
             }
 
-            ScrollView([.horizontal, .vertical]) {
+            ScrollView(.vertical) {
                 Text(file.content)
                     .font(font)
                     .textSelection(.enabled)
@@ -133,7 +133,7 @@ struct FileContentView: View {
 
             Divider()
 
-            ScrollView([.horizontal, .vertical]) {
+            ScrollView(.vertical) {
                 Text(file.content)
                     .font(font)
                     .textSelection(.enabled)
@@ -232,7 +232,7 @@ struct FileContentView: View {
 
             Divider()
 
-            ScrollView([.horizontal, .vertical]) {
+            ScrollView(.vertical) {
                 Text(file.content)
                     .font(font)
                     .textSelection(.enabled)

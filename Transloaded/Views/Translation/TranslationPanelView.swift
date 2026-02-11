@@ -66,7 +66,7 @@ struct TranslationPanelView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
-            ScrollView([.horizontal, .vertical]) {
+            ScrollView(.vertical) {
                 Text(panel.translatedContent)
                     .font(font)
                     .textSelection(.enabled)
