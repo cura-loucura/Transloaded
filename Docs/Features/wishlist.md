@@ -1,6 +1,6 @@
 Wishlist:
 
-- Ctrl + +/- to increase and decrease font-size
+- Delete of files when they are on the default folder instead of "Remove from Sidebar" which does nothing currently 
 
 - Refresh files and directory listing when changed (files deleted elsewhere for example)
 
@@ -14,4 +14,3 @@ Wishlist:
 
 - transloaded.app website
 
-- Download of language pairs directly on the settings panel

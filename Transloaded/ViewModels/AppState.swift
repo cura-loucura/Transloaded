@@ -188,33 +188,38 @@ class AppState {
     }
 
     private func performOpenTextFile(url: URL) {
-        do {
-            let content = try fileSystemService.readFileContent(at: url)
-            let detected = detectLanguage(for: content) ?? settingsState?.defaultSourceLanguage
-            let file = OpenFile(
-                url: url,
-                name: url.lastPathComponent,
-                content: content,
-                detectedLanguage: detected
-            )
-            openFiles.append(file)
-            activeFileID = file.id
-            recentItemsManager?.addRecentFile(url)
+        let file = OpenFile(url: url, name: url.lastPathComponent, content: "")
+        openFiles.append(file)
+        activeFileID = file.id
+        recentItemsManager?.addRecentFile(url)
 
-            // Auto-open translation panel if default target language is set and differs from source
-            if let targetLang = settingsState?.defaultTargetLanguage,
-               targetLang != detected {
-                addTranslation(for: file.id, language: targetLang)
-            }
+        let fileID = file.id
+        Task {
+            do {
+                let content = try await Task.detached(priority: .userInitiated) {
+                    try FileSystemService().readFileContent(at: url)
+                }.value
+                guard let index = self.openFiles.firstIndex(where: { $0.id == fileID }) else { return }
+                let detected = self.detectLanguage(for: content) ?? self.settingsState?.defaultSourceLanguage
+                self.openFiles[index].content = content
+                self.openFiles[index].detectedLanguage = detected
+                self.openFiles[index].selectedSourceLanguage = detected
 
-            fileWatcherService.watch(url: url) { [weak self] changedURL in
-                Task { @MainActor in
-                    self?.markFileAsExternallyModified(url: changedURL)
+                if let targetLang = self.settingsState?.defaultTargetLanguage,
+                   targetLang != detected {
+                    self.addTranslation(for: fileID, language: targetLang)
                 }
+            } catch {
+                self.errorMessage = "Failed to open \(url.lastPathComponent): \(error.localizedDescription)"
+                self.showError = true
+                self.openFiles.removeAll { $0.id == fileID }
             }
-        } catch {
-            errorMessage = "Failed to open \(url.lastPathComponent): \(error.localizedDescription)"
-            showError = true
+        }
+
+        fileWatcherService.watch(url: url) { [weak self] changedURL in
+            Task { @MainActor in
+                self?.markFileAsExternallyModified(url: changedURL)
+            }
         }
     }
 

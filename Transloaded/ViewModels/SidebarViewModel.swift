@@ -21,6 +21,7 @@ class SidebarViewModel {
     var showImportToFolderAlert = false
 
     private var defaultFolderWatcher = FileWatcherService()
+    private var defaultFolderRefreshTask: Task<Void, Never>?
 
     func addDirectory() {
         let panel = NSOpenPanel()
@@ -89,9 +90,14 @@ class SidebarViewModel {
     }
 
     func refreshRoot(at url: URL) {
-        guard let index = roots.firstIndex(where: { $0.url == url }) else { return }
-        let refreshed = fileSystemService.loadDirectory(at: url)
-        roots[index] = refreshed
+        guard roots.contains(where: { $0.url == url }) else { return }
+        Task {
+            let refreshed = await Task.detached(priority: .utility) {
+                FileSystemService().loadDirectory(at: url)
+            }.value
+            guard let currentIndex = self.roots.firstIndex(where: { $0.url == url }) else { return }
+            self.roots[currentIndex] = refreshed
+        }
     }
 
     func addURLs(_ urls: [URL]) {
@@ -104,16 +110,38 @@ class SidebarViewModel {
         guard let path = settingsState?.defaultFolderPath else { return }
         let url = URL(fileURLWithPath: path).standardized
         try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-        defaultFolderItem = fileSystemService.loadDirectory(at: url)
+        Task {
+            let item = await Task.detached(priority: .utility) {
+                FileSystemService().loadDirectory(at: url)
+            }.value
+            self.defaultFolderItem = item
+        }
         defaultFolderWatcher.watch(url: url) { [weak self] _ in
-            DispatchQueue.main.async { self?.refreshDefaultFolder() }
+            DispatchQueue.main.async { self?.scheduleDefaultFolderRefresh() }
         }
     }
 
     func refreshDefaultFolder() {
         guard let path = settingsState?.defaultFolderPath else { return }
         let url = URL(fileURLWithPath: path).standardized
-        defaultFolderItem = fileSystemService.loadDirectory(at: url)
+        Task {
+            let item = await Task.detached(priority: .utility) {
+                FileSystemService().loadDirectory(at: url)
+            }.value
+            self.defaultFolderItem = item
+        }
+    }
+
+    private func scheduleDefaultFolderRefresh() {
+        defaultFolderRefreshTask?.cancel()
+        defaultFolderRefreshTask = Task { @MainActor [weak self] in
+            do {
+                try await Task.sleep(for: .milliseconds(300))
+            } catch {
+                return
+            }
+            self?.refreshDefaultFolder()
+        }
     }
 
     // MARK: - New Folder
