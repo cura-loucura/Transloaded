@@ -14,6 +14,7 @@ class SettingsState {
     private static let editorFontSizeKey = "editorFontSize"
     private static let rememberOpenItemsKey = "rememberOpenItems"
     private static let defaultFolderPathKey = "defaultFolderPath"
+    private static let hasSeenTutorialKey = "hasSeenTutorial"
 
     private static let sessionSidebarBookmarksKey = "sessionSidebarBookmarks"
     private static let sessionOpenFileBookmarksKey = "sessionOpenFileBookmarks"
@@ -86,6 +87,10 @@ class SettingsState {
         didSet { UserDefaults.standard.set(defaultFolderPath, forKey: Self.defaultFolderPathKey) }
     }
 
+    var hasSeenTutorial: Bool {
+        didSet { UserDefaults.standard.set(hasSeenTutorial, forKey: Self.hasSeenTutorialKey) }
+    }
+
     var editorFont: Font {
         if editorFontName.isEmpty {
             return .system(size: CGFloat(editorFontSize), design: .monospaced)
@@ -152,6 +157,13 @@ class SettingsState {
         self.defaultFolderPath = UserDefaults.standard.string(forKey: Self.defaultFolderPathKey)
             ?? FileManager.default.homeDirectoryForCurrentUser
                 .appendingPathComponent("Documents/Transloaded").path
+
+        // Load tutorial seen state (default: false)
+        if UserDefaults.standard.object(forKey: Self.hasSeenTutorialKey) != nil {
+            self.hasSeenTutorial = UserDefaults.standard.bool(forKey: Self.hasSeenTutorialKey)
+        } else {
+            self.hasSeenTutorial = false
+        }
     }
 
     func toggleLanguage(_ language: SupportedLanguage) {

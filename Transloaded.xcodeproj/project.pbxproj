@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -24,12 +24,14 @@
 		8D39DEA464E0D5296FBF5257 /* SupportedLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DAFC43AADA9575A0C7FB14D /* SupportedLanguage.swift */; };
 		8ECA300D87A27DED3D793951 /* TranslationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C9A3AF9CAD9B858ACC78612 /* TranslationViewModel.swift */; };
 		932F6026C5313B1793255EF4 /* TransloadedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2627E87F7E3AF1223E2A2D1A /* TransloadedApp.swift */; };
+		9F3F464C287BB111278F721D /* TutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A515369C7E9037158E1495 /* TutorialView.swift */; };
 		B73FD22D26C8381A73731979 /* ContinuityCameraReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 789E14D6FA864EF072E02E20 /* ContinuityCameraReceiver.swift */; };
 		BA50A0E27ED6FF25E6E5D465 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1C14B169DB4103AA755EC0A8 /* Preview Assets.xcassets */; };
 		C599F976FF5FE88C130F64E5 /* RecentItemsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4F04861E45A9074EC67F19 /* RecentItemsManager.swift */; };
 		C5A48D49B110130CC354613F /* PDFService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C830EA29FD2BE4279C627D47 /* PDFService.swift */; };
 		C60CB08644BC45898044C6A6 /* TranslationPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D3E3261C0C15990BAE45D4 /* TranslationPanelView.swift */; };
 		C7325A12F4914C7241A12972 /* TranslationPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6583AC63503A78DB6584C0E7 /* TranslationPanel.swift */; };
+		CDD35959CD11253E38BFA1C4 /* TutorialPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F00B59DE91A900641A8A9A7 /* TutorialPage.swift */; };
 		CE96FE49E63103459ACBF496 /* PDFKitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0A244AE693C78C21D116572 /* PDFKitView.swift */; };
 		D863EF12DCE656AFF566345C /* SettingsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD90D58D1B9E48AE53327498 /* SettingsState.swift */; };
 		F0AE228488EAFC3FA1D0BF1C /* OCRService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21FFCB8674106B0EA5CC9E11 /* OCRService.swift */; };
@@ -41,6 +43,7 @@
 		03CE3DBAEE20961453D19CF1 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarView.swift; sourceTree = "<group>"; };
 		0B41CB69547601DDF7FE99E8 /* FileWatcherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileWatcherService.swift; sourceTree = "<group>"; };
 		1275C711E7692B43EE9F46C3 /* CameraImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraImportService.swift; sourceTree = "<group>"; };
+		18A515369C7E9037158E1495 /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialView.swift; sourceTree = "<group>"; };
 		1C14B169DB4103AA755EC0A8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		21FFCB8674106B0EA5CC9E11 /* OCRService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRService.swift; sourceTree = "<group>"; };
 		24E70CA4F8A58ADD6007531C /* FileItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileItem.swift; sourceTree = "<group>"; };
@@ -52,6 +55,7 @@
 		6DAFC43AADA9575A0C7FB14D /* SupportedLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedLanguage.swift; sourceTree = "<group>"; };
 		789E14D6FA864EF072E02E20 /* ContinuityCameraReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinuityCameraReceiver.swift; sourceTree = "<group>"; };
 		8C9A3AF9CAD9B858ACC78612 /* TranslationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationViewModel.swift; sourceTree = "<group>"; };
+		8F00B59DE91A900641A8A9A7 /* TutorialPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialPage.swift; sourceTree = "<group>"; };
 		92D3E3261C0C15990BAE45D4 /* TranslationPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationPanelView.swift; sourceTree = "<group>"; };
 		9A460677C5B821C4750DABD3 /* EditorAreaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorAreaView.swift; sourceTree = "<group>"; };
 		9AE7D20BD76FB1C664789ABF /* Transloaded.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transloaded.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -106,8 +110,17 @@
 				6DAFC43AADA9575A0C7FB14D /* SupportedLanguage.swift */,
 				6890E0EFDC7CDDF2555D2330 /* TranslationError.swift */,
 				6583AC63503A78DB6584C0E7 /* TranslationPanel.swift */,
+				8F00B59DE91A900641A8A9A7 /* TutorialPage.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		2D163D3FA957E24EE0F8DA99 /* Tutorial */ = {
+			isa = PBXGroup;
+			children = (
+				18A515369C7E9037158E1495 /* TutorialView.swift */,
+			);
+			path = Tutorial;
 			sourceTree = "<group>";
 		};
 		6DC2731F8D2F8F49141FFB3E /* ViewModels */ = {
@@ -175,6 +188,7 @@
 				BC0FE5EF58EA9F9BCBC9F4EA /* Settings */,
 				F60DD4B5CBB333881EF47FA9 /* Sidebar */,
 				0ADE802E60E46FF43AEF3E13 /* Translation */,
+				2D163D3FA957E24EE0F8DA99 /* Tutorial */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -241,6 +255,7 @@
 			);
 			mainGroup = FA2BFED9BFE0C616EEC29443;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -292,6 +307,8 @@
 				8BB83C24C3C95EE6476B05B0 /* TranslationService.swift in Sources */,
 				8ECA300D87A27DED3D793951 /* TranslationViewModel.swift in Sources */,
 				932F6026C5313B1793255EF4 /* TransloadedApp.swift in Sources */,
+				CDD35959CD11253E38BFA1C4 /* TutorialPage.swift in Sources */,
+				9F3F464C287BB111278F721D /* TutorialView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,20 +382,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = Transloaded/Transloaded.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7387Q28AG9;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
-				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
-				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
-				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
-				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
-				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Transloaded;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -388,15 +397,9 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.transloaded.app;
 				PRODUCT_NAME = Transloaded;
-				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
-				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
-				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
-				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
-				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
-				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
 				SDKROOT = macosx;
 				SWIFT_VERSION = 6.0;
 			};
@@ -406,20 +409,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				AUTOMATION_APPLE_EVENTS = NO;
 				CODE_SIGN_ENTITLEMENTS = Transloaded/Transloaded.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7387Q28AG9;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
-				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
-				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
-				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
-				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
-				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Transloaded;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -429,15 +424,9 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.transloaded.app;
 				PRODUCT_NAME = Transloaded;
-				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
-				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
-				RUNTIME_EXCEPTION_ALLOW_UNSIGNED_EXECUTABLE_MEMORY = NO;
-				RUNTIME_EXCEPTION_DEBUGGING_TOOL = NO;
-				RUNTIME_EXCEPTION_DISABLE_EXECUTABLE_PAGE_PROTECTION = NO;
-				RUNTIME_EXCEPTION_DISABLE_LIBRARY_VALIDATION = NO;
 				SDKROOT = macosx;
 				SWIFT_VERSION = 6.0;
 			};

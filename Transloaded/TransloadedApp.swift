@@ -65,6 +65,7 @@ struct TransloadedApp: App {
     @State private var translationViewModel = TranslationViewModel()
     @State private var settingsState = SettingsState()
     @State private var recentItemsManager = RecentItemsManager()
+    @State private var showTutorial = false
 
     var body: some Scene {
         WindowGroup {
@@ -74,7 +75,15 @@ struct TransloadedApp: App {
                 translationViewModel: translationViewModel,
                 settingsState: settingsState
             )
+            .sheet(isPresented: $showTutorial) {
+                TutorialView(isPresented: $showTutorial) {
+                    settingsState.hasSeenTutorial = true
+                }
+            }
             .onAppear {
+                if !settingsState.hasSeenTutorial {
+                    showTutorial = true
+                }
                 appState.translationService = translationViewModel.translationService
                 appState.translationViewModel = translationViewModel
                 appState.settingsState = settingsState
@@ -182,6 +191,12 @@ struct TransloadedApp: App {
                     settingsState.editorFontSize = 13
                 }
                 .keyboardShortcut("0", modifiers: .command)
+            }
+
+            CommandGroup(replacing: .help) {
+                Button("Transloaded Help") {
+                    showTutorial = true
+                }
             }
         }
 
