@@ -10,6 +10,10 @@ struct ContentView: View {
 
     private let cameraImportService = CameraImportService()
     @State private var showCameraMenu = false
+    @State private var pendingCameraImage: NSImage?
+    @State private var pendingCameraFolder: URL?
+    @State private var pendingLibraryImages: [NSImage] = []
+    @State private var showingQualityPicker = false
 
     private var selectedFileURL: Binding<URL?> {
         Binding<URL?>(
@@ -68,6 +72,17 @@ struct ContentView: View {
                     Label("Import from Camera", systemImage: "camera.fill")
                 }
                 .help("Import from iPhone Camera")
+                .disabled(sidebarViewModel.defaultFolderItem == nil)
+
+                Button(action: {
+                    presentPhotoLibraryPicker(
+                        onImagesPicked: { images in handleLibraryImages(images) },
+                        onDismiss: {}
+                    )
+                }) {
+                    Label("Import Images", systemImage: "photo.on.rectangle")
+                }
+                .help("Import images from disk")
                 .disabled(sidebarViewModel.defaultFolderItem == nil)
             }
 
@@ -129,6 +144,11 @@ struct ContentView: View {
                     Label("Font", systemImage: "textformat.size")
                 }
                 .help("Font Settings")
+            }
+        }
+        .sheet(isPresented: $showingQualityPicker) {
+            ImageQualityPickerView { quality in
+                savePendingImages(quality: quality)
             }
         }
         .onDrop(of: [.fileURL], isTargeted: nil) { providers in
@@ -210,14 +230,46 @@ struct ContentView: View {
             return
         }
 
-        do {
-            let savedURL = try cameraImportService.saveImage(image, to: targetFolder)
+        pendingCameraImage = image
+        pendingCameraFolder = targetFolder
+        showingQualityPicker = true
+    }
+
+    private func savePendingImages(quality: ImageQualityOption) {
+        if let image = pendingCameraImage, let targetFolder = pendingCameraFolder {
+            pendingCameraImage = nil
+            pendingCameraFolder = nil
+            do {
+                let savedURL = try cameraImportService.saveImage(image, to: targetFolder, quality: quality)
+                refreshAfterCameraImport(targetFolder: targetFolder)
+                appState.openFile(url: savedURL)
+            } catch {
+                appState.errorMessage = "Camera import failed: \(error.localizedDescription)"
+                appState.showError = true
+            }
+        } else if !pendingLibraryImages.isEmpty, let targetFolder = pendingCameraFolder {
+            let images = pendingLibraryImages
+            pendingLibraryImages = []
+            pendingCameraFolder = nil
+            var lastURL: URL?
+            for image in images {
+                lastURL = try? cameraImportService.saveImage(image, to: targetFolder, quality: quality)
+            }
             refreshAfterCameraImport(targetFolder: targetFolder)
-            appState.openFile(url: savedURL)
-        } catch {
-            appState.errorMessage = "Camera import failed: \(error.localizedDescription)"
-            appState.showError = true
+            if let url = lastURL { appState.openFile(url: url) }
         }
+    }
+
+    private func handleLibraryImages(_ images: [NSImage]) {
+        guard !images.isEmpty else { return }
+        guard let targetFolder = cameraTargetFolder else {
+            appState.errorMessage = "No import folder available"
+            appState.showError = true
+            return
+        }
+        pendingLibraryImages = images
+        pendingCameraFolder = targetFolder
+        showingQualityPicker = true
     }
 
     private func handleCameraPDF(_ data: Data) {
