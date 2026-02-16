@@ -329,9 +329,14 @@ struct FileContentView: View {
 
     private var emptyState: some View {
         VStack(spacing: 16) {
-            Image(systemName: "doc.text")
-                .font(.system(size: 40))
-                .foregroundStyle(.tertiary)
+            Image("AppLogo")
+                .resizable()
+                .renderingMode(.original)
+                .interpolation(.high)
+                .antialiased(true)
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 96, height: 96)
+                .opacity(0.35)
             Text("No file open")
                 .font(.title3)
                 .foregroundStyle(.secondary)

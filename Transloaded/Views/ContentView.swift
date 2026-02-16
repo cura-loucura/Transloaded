@@ -60,19 +60,6 @@ struct ContentView: View {
             }
         }
         .toolbar {
-            ToolbarItem(placement: .navigation) {
-                HStack(spacing: 5) {
-                    Image("AppLogo")
-                        .resizable()
-                        .interpolation(.high)
-                        .antialiased(true)
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: 28)
-                    Text("Transloaded  ")
-                        .fontWeight(.semibold)
-                }
-            }
-
             ToolbarItemGroup(placement: .primaryAction) {
                 Button(action: { sidebarViewModel.addFile() }) {
                     Label("Open File", systemImage: "doc.badge.plus")
