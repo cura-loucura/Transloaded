@@ -92,7 +92,9 @@ class CameraReceiverView: NSView, @preconcurrency NSServicesMenuRequestor {
         accumulatedPDFData.append(pdfData)
         scanFlushTimer?.invalidate()
         scanFlushTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { [weak self] _ in
-            self?.flushPending()
+            Task { @MainActor [weak self] in
+                self?.flushPending()
+            }
         }
     }
 
