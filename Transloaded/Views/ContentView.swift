@@ -1,6 +1,7 @@
 import SwiftUI
 import Translation
 import UniformTypeIdentifiers
+import PhotosUI
 
 struct ContentView: View {
     @Bindable var sidebarViewModel: SidebarViewModel
@@ -10,6 +11,8 @@ struct ContentView: View {
 
     private let cameraImportService = CameraImportService()
     @State private var showCameraMenu = false
+    @State private var showPhotoPicker = false
+    @State private var selectedPhotoItems: [PhotosPickerItem] = []
     @State private var pendingCameraImage: NSImage?
     @State private var pendingCameraFolder: URL?
     @State private var pendingLibraryImages: [NSImage] = []
@@ -74,16 +77,22 @@ struct ContentView: View {
                 .help("Import from iPhone Camera")
                 .disabled(sidebarViewModel.defaultFolderItem == nil)
 
-                Button(action: {
-                    presentPhotoLibraryPicker(
-                        onImagesPicked: { images in handleLibraryImages(images) },
-                        onDismiss: {}
-                    )
-                }) {
+                Button(action: { showPhotoPicker = true }) {
                     Label("Import Images", systemImage: "photo.on.rectangle")
                 }
                 .help("Import images from disk")
                 .disabled(sidebarViewModel.defaultFolderItem == nil)
+                .photosPicker(
+                    isPresented: $showPhotoPicker,
+                    selection: $selectedPhotoItems,
+                    maxSelectionCount: 20,
+                    matching: .images
+                )
+                .onChange(of: selectedPhotoItems) { _, items in
+                    Task {
+                        await loadSelectedPhotos(items)
+                    }
+                }
             }
 
             ToolbarItemGroup(placement: .secondaryAction) {
@@ -270,6 +279,20 @@ struct ContentView: View {
         pendingLibraryImages = images
         pendingCameraFolder = targetFolder
         showingQualityPicker = true
+    }
+
+    private func loadSelectedPhotos(_ items: [PhotosPickerItem]) async {
+        var loadedImages: [NSImage] = []
+        for item in items {
+            if let data = try? await item.loadTransferable(type: Data.self),
+               let image = NSImage(data: data) {
+                loadedImages.append(image)
+            }
+        }
+        selectedPhotoItems = []
+        if !loadedImages.isEmpty {
+            handleLibraryImages(loadedImages)
+        }
     }
 
     private func handleCameraPDF(_ data: Data) {
